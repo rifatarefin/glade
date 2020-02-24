@@ -1,0 +1,22 @@
+// apply the 'java' plugin to add support for Java
+apply plugin: 'java'
+
+// set Java version
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// apply the 'application' plugin to make glade runnable
+apply plugin: 'application'
+
+// specify the main class
+mainClassName = 'glade.main.Main'
+
+repositories {
+    // use 'jcenter' for resolving dependencies
+    jcenter()
+}
+
+compileJava {
+    options.warnings = true
+    options.deprecation = true
+}
