@@ -14,49 +14,55 @@
 
 package glade.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import picocli.CommandLine;
+
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Log {
-	private static String logName = null;
-	private static boolean verboseValue = false;
-	
-	public static void init(String log, boolean verbose) {
-		logName = log;
-		verboseValue = verbose;
-		new File(logName).delete();
-	}
-	
-	public static void info(String s) {
-		if(logName == null) {
-			return;
-		}
-		if(verboseValue) {
-			System.out.println(s);
-		}
-		try {
-			PrintWriter pw = new PrintWriter(new FileOutputStream(logName, true));
-			pw.println(s);
-			pw.close();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+    public enum Level {
+        OFF(null), ERROR("red"), INFO("white"), DEBUG("white"), ALL(null);
+
+        final String color;
+
+        Level(String color) {
+            this.color = color;
+        }
+    }
+
+    private static OutputStream outputStream = null;
+	private static Level loggingLevel = Level.OFF;
+
+	public static void init(OutputStream outputStream, Level loggingLevel) {
+		Log.outputStream = outputStream;
+		Log.loggingLevel = loggingLevel;
 	}
 
-	public static void err(Exception e) {
-		if(verboseValue) {
-			e.printStackTrace();
-		} else {
-			System.err.println(e.getMessage());
-		}
-		try {
-			PrintWriter pw = new PrintWriter(new FileOutputStream(logName, true));
-			e.printStackTrace(pw);
-			pw.close();
-		} catch(IOException ep) {
-			ep.printStackTrace();
-		}
+	public static void error(String message) {
+	    writeLog(Level.ERROR, message);
 	}
+
+    public static void info(String message) {
+	    writeLog(Level.INFO, message);
+    }
+
+    public static void debug(String message) {
+	    writeLog(Level.DEBUG, message);
+    }
+
+    private static void writeLog(Level level, String message) {
+        if (loggingLevel.ordinal() >= level.ordinal()) {
+            try {
+                outputStream.write(CommandLine.Help.Ansi.AUTO.string(
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS").format(LocalDateTime.now())
+                        + " - @|" + level.color + " " + level + "|@ - " + message + "\n")
+                    .getBytes(StandardCharsets.UTF_8)); // TODO test this with files
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
 }

@@ -73,7 +73,7 @@ public class GrammarFuzzer {
 			return this.boxSize;
 		}
 	}
-	
+
 	public static class IntBox {
 		private int value;
 		public IntBox(int value) {
@@ -86,7 +86,7 @@ public class GrammarFuzzer {
 			return this.value;
 		}
 	}
-	
+
 	private static ParseTreeNode sampleHelper(Node grammar, NodeMerges recursiveNodes, SampleParameters parameters, Random random, Map<Node,ParseTreeNode> backup, IntBox length) {
 		if(length.value() == 0) {
 			return backup.get(grammar);
@@ -122,14 +122,14 @@ public class GrammarFuzzer {
 			throw new RuntimeException("Invalid node type: " + grammar.getClass().getName());
 		}
 	}
-	
+
 	private static void getBackup(ParseTreeNode node, Map<Node,ParseTreeNode> backup) {
 		backup.put(node.getNode(), node);
 		for(ParseTreeNode child : node.getChildren()) {
 			getBackup(child, backup);
 		}
 	}
-	
+
 	public static ParseTreeNode sample(Node program, Grammar grammar, SampleParameters parameters, Random random) {
 		Map<Node,ParseTreeNode> backup = new HashMap<Node,ParseTreeNode>();
 		if(grammar.node instanceof MultiAlternationNode) {
@@ -156,46 +156,46 @@ public class GrammarFuzzer {
 		}
 		return sampleHelper(program, grammar.merges, parameters, random, backup, new IntBox(parameters.getBoxSize()));
 	}
-	
+
 	public static class GrammarSampler implements Iterator<String>, Iterable<String> {
 		private final Grammar grammar;
 		private final SampleParameters parameters;
 		private final Random random;
-		
+
 		public GrammarSampler(Grammar grammar, SampleParameters parameters, Random random) {
 			this.grammar = grammar;
 			this.parameters = parameters;
 			this.random = random;
 		}
-		
+
 		@Override
 		public boolean hasNext() {
 			return true;
 		}
-		
+
 		@Override
 		public String next() {
 			return GrammarFuzzer.sample(this.grammar.node, this.grammar, this.parameters, this.random).getExample();
 		}
-		
+
 		@Override
 		public Iterator<String> iterator() {
 			return this;
 		}
-		
+
 		@Override
 		public void remove() {
 			throw new RuntimeException("Remove not supported!");
 		}
 	}
-	
+
 	public static class GrammarMutationSampler implements Iterator<String>, Iterable<String> {
 		private final Grammar grammar;
 		private final SampleParameters parameters;
 		private final int maxLength;
 		private final int numMutations;
 		private final Random random;
-		
+
 		public GrammarMutationSampler(Grammar grammar, SampleParameters parameters, int maxLength, int numMutations, Random random) {
 			this.grammar = grammar;
 			this.parameters = parameters;
@@ -203,7 +203,7 @@ public class GrammarFuzzer {
 			this.numMutations = numMutations;
 			this.random = random;
 		}
-		
+
 		private ParseTreeNode sampleHelper(ParseTreeNode seed) {
 			List<ParseTreeNode>[] descendants = ParseTreeUtils.getDescendantsByType(seed);
 			int isMultiConstant = descendants[1].isEmpty() || (!descendants[0].isEmpty() && this.random.nextBoolean()) ? 0 : 1;
@@ -213,7 +213,7 @@ public class GrammarFuzzer {
 			ParseTreeNode result = ParseTreeUtils.getSubstitute(seed, cur, sub);
 			return result;
 		}
-		
+
 		private ParseTreeNode sample(ParseTreeNode seed) {
 			while(true) {
 				ParseTreeNode result = sampleHelper(seed);
@@ -222,7 +222,7 @@ public class GrammarFuzzer {
 				}
 			}
 		}
-		
+
 		public String sampleOne(Node node) {
 			ParseTreeNode cur = ParseTreeUtils.getParseTree(node);
 			int choice = this.random.nextInt(this.numMutations);
@@ -231,12 +231,12 @@ public class GrammarFuzzer {
 			}
 			return cur.getExample();
 		}
-		
+
 		@Override
 		public boolean hasNext() {
 			return true;
 		}
-		
+
 		@Override
 		public String next() {
 			Node node = this.grammar.node;
@@ -249,34 +249,34 @@ public class GrammarFuzzer {
 				return this.sampleOne(node);
 			}
 		}
-		
+
 		@Override
 		public Iterator<String> iterator() {
 			return this;
 		}
-		
+
 		@Override
 		public void remove() {
 			throw new RuntimeException("Remove not supported!");
 		}
 	}
-	
+
 	public static class CombinedMutationSampler implements Iterator<String>, Iterable<String> {
 		private final Iterator<String> sampler;
 		private final int numMutations;
 		private final Random random;
-		
+
 		public CombinedMutationSampler(Iterable<String> sampler, int numMutations, Random random) {
 			this.sampler = sampler.iterator();
 			this.numMutations = numMutations;
 			this.random = random;
 		}
-		
+
 		@Override
 		public boolean hasNext() {
 			return this.sampler.hasNext();
 		}
-		
+
 		@Override
 		public String next() {
 			String sample = this.sampler.next();
@@ -285,22 +285,22 @@ public class GrammarFuzzer {
 			}
 			return this.random.nextBoolean() ? sample : nextStringMutant(sample, this.random.nextInt(this.numMutations), this.random);
 		}
-		
+
 		@Override
 		public Iterator<String> iterator() {
 			return this;
 		}
-		
+
 		@Override
 		public void remove() {
 			throw new RuntimeException("Remove not supported!");
 		}
 	}
-	
+
 	private static char nextChar(Random random) {
-		return (char)random.nextInt(128);
+		return (char)random.nextInt(128); // TODO change bound value
 	}
-	
+
 	// performs a single edit to the string
 	private static String nextStringMutant(String string, Random random) {
 		if(string.length() == 0) { return "" + nextChar(random); }
@@ -314,7 +314,7 @@ public class GrammarFuzzer {
 			return head + (tail.length() == 0 ? "" : tail.substring(1));
 		}
 	}
-	
+
 	private  static String nextStringMutant(String string, int numMutantions, Random random) {
 		for(int i=0; i<numMutantions; i++) {
 			string = nextStringMutant(string, random);

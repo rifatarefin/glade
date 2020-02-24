@@ -38,7 +38,7 @@ public class GrammarTransformer {
 		Node transformFlatten = getTransform(node, new FlattenTransformer());
 		return getTransform(transformFlatten, new ConstantTransformer(oracle, getMultiAlternationRepetitionConstantNodes(transformFlatten)));
 	}
-	
+
 	private static interface NodeTransformer {
 		public abstract Node transformConstant(ConstantNode node);
 		public abstract Node transformMultiConstant(MultiConstantNode node);
@@ -46,7 +46,7 @@ public class GrammarTransformer {
 		public abstract Node transformRepetition(RepetitionNode node, Node newStart, Node newRep, Node newEnd);
 		public abstract Node transformMultiAlternation(MultiAlternationNode node, List<Node> newChildren);
 	}
-	
+
 	private static Node getTransform(Node node, NodeTransformer transformer) {
 		if(node instanceof ConstantNode) {
 			return transformer.transformConstant((ConstantNode)node);
@@ -73,7 +73,7 @@ public class GrammarTransformer {
 			throw new RuntimeException("Invalid node type: " + node.getClass().getName());
 		}
 	}
-	
+
 	private static MultiConstantNode generalizeConstant(ConstantNode node, DiscriminativeOracle oracle) {
 		String example = node.getData().example;
 		Context context = node.getData().context;
@@ -89,7 +89,7 @@ public class GrammarTransformer {
 			Context curContext = new Context(context, example.substring(0, i), example.substring(i+1), example.substring(0, i), example.substring(i+1));
 			characterOption.add(curC);
 			characterCheck.add(curC);
-			for(CharacterGeneralization generalization : CharacterUtils.getGeneralizations()) {
+			for(CharacterGeneralization generalization : CharacterUtils.getInstance().getGeneralizations()) {
 				if(generalization.triggers.contains(curC)) {
 					List<String> checks = new ArrayList<String>();
 					for(char c : generalization.checks) {
@@ -116,7 +116,7 @@ public class GrammarTransformer {
 		}
 		return new MultiConstantNode(node.getData(), characterOptions, characterChecks);
 	}
-	
+
 	private static boolean isContained(String example, MultiConstantNode mconstNode) {
 		if(example.length() != mconstNode.characterOptions.size()) {
 			return false;
@@ -128,7 +128,7 @@ public class GrammarTransformer {
 		}
 		return true;
 	}
-	
+
 	private static boolean isContained(String example, List<MultiConstantNode> mconstNodes) {
 		for(MultiConstantNode mconstNode : mconstNodes) {
 			if(isContained(example, mconstNode)) {
@@ -137,7 +137,7 @@ public class GrammarTransformer {
 		}
 		return false;
 	}
-	
+
 	private static MultiAlternationNode generalizeMultiAlternationConstant(MultiAlternationNode node, MultivalueMap<MultiAlternationNode,ConstantNode> multiAlternationNodeConstantChildren, DiscriminativeOracle oracle) {
 		List<MultiConstantNode> curConsts = new ArrayList<MultiConstantNode>();
 		Log.info("GENERALIZING MULTI ALT: " + node.getData().example);
@@ -148,7 +148,7 @@ public class GrammarTransformer {
 		}
 		return new MultiAlternationNode(node.getData(), new ArrayList<Node>(curConsts));
 	}
-	
+
 	private static class ConstantTransformer implements NodeTransformer {
 		private final DiscriminativeOracle oracle;
 		private final MultivalueMap<MultiAlternationNode,ConstantNode> multiAlternationNodeConstantChildren;
@@ -176,7 +176,7 @@ public class GrammarTransformer {
 			return new RepetitionNode(node.getData(), newStart, newRep, newEnd);
 		}
 	}
-	
+
 	private static class FlattenTransformer implements NodeTransformer {
 		public Node transformConstant(ConstantNode node) {
 			return node;
@@ -205,7 +205,7 @@ public class GrammarTransformer {
 			return new RepetitionNode(node.getData(), newStart, newRep, newEnd);
 		}
 	}
-	
+
 	private static void getMultiAlternationRepetitionConstantNodesHelper(Node node, MultivalueMap<MultiAlternationNode,ConstantNode> result, boolean isParentRep) {
 		Maybe<List<Node>> constantChildren = GrammarSynthesis.getMultiAlternationRepetitionConstantChildren(node, isParentRep);
 		if(constantChildren.hasT()) {
@@ -223,7 +223,7 @@ public class GrammarTransformer {
 			}
 		}
 	}
-	
+
 	private static MultivalueMap<MultiAlternationNode,ConstantNode> getMultiAlternationRepetitionConstantNodes(Node root) {
 		MultivalueMap<MultiAlternationNode,ConstantNode> result = new MultivalueMap<MultiAlternationNode,ConstantNode>();
 		getMultiAlternationRepetitionConstantNodesHelper(root, result, false);

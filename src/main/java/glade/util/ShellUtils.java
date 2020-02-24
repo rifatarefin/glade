@@ -33,7 +33,7 @@ public class ShellUtils {
 	public static void delete(String filename) {
 		new File(filename).delete();
 	}
-	
+
 	public static void write(String query, File file) {
 		file.delete();
 		try {
@@ -44,11 +44,11 @@ public class ShellUtils {
 			throw new RuntimeException("Error writing seed file!", e);
 		}
 	}
-	
+
 	public static void write(String query, String filename) {
 		write(query, new File(filename));
 	}
-	
+
 	public static String read(InputStream input) {
 		try {
 			StringBuilder result = new StringBuilder();
@@ -63,7 +63,7 @@ public class ShellUtils {
 			throw new RuntimeException("Error reading program output stream!", e);
 		}
 	}
-	
+
 	private static Process executeNoWait(String command) {
 		try {
 			String[] shellCommand = {"/bin/sh", "-c", command};
@@ -72,7 +72,7 @@ public class ShellUtils {
 			throw new RuntimeException("Error executing command: " + command, e);
 		}
 	}
-	
+
 	public static String executeForStream(final String command, final boolean isError, long timeoutMillis) {
 		final Process process = executeNoWait(command);
 		Callable<String> exec = new Callable<String>() {
@@ -109,25 +109,25 @@ public class ShellUtils {
 			return result;
 		}
 	}
-	
+
 	public static interface CommandFactory {
 		public abstract String getCommand(String filename, String auxFilename, String exePath);
 	}
-	
+
 	public static class SimpleCommandFactory implements CommandFactory {
 		@Override
 		public String getCommand(String filename, String auxFilename, String exePath) {
 			return exePath + " " + filename;
 		}
 	}
-	
-	public static class ShellOracle implements Oracle {
+
+	public static class ShellOracle implements Oracle { // TODO maybe use this
 		private final String command;
 		private final String filename;
 		private final String auxFilename;
 		private final boolean isError;
 		private final long timeoutMillis;
-		
+
 		public ShellOracle(String filename, String auxFilename, String command, boolean isError, long timeoutMillis) {
 			this.filename = filename;
 			this.auxFilename = auxFilename;
@@ -135,7 +135,7 @@ public class ShellUtils {
 			this.isError = isError;
 			this.timeoutMillis = timeoutMillis;
 		}
-		
+
 		@Override
 		public String execute(String query) {
 			write("", this.auxFilename);
@@ -146,10 +146,10 @@ public class ShellUtils {
 			return result;
 		}
 	}
-	
+
 	public static class ExecuteDiscriminativeOracle implements DiscriminativeOracle {
 		private final Oracle oracle;
-		
+
 		public ExecuteDiscriminativeOracle(Oracle oracle) {
 			this.oracle = oracle;
 		}

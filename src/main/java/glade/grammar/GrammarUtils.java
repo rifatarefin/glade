@@ -14,6 +14,7 @@
 
 package glade.grammar;
 
+import glade.util.CharacterUtils;
 import glade.util.Utils.MultivalueMap;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class GrammarUtils {
 			this.merges = merges;
 		}
 	}
-	
+
 	public static final class Context {
 		public final String pre;
 		public final String post;
@@ -52,7 +53,7 @@ public class GrammarUtils {
 			return !this.pre.equals(this.extraPre) || !this.post.equals(this.extraPost);
 		}
 	}
-	
+
 	public static class NodeData {
 		public final String example;
 		public final Context context;
@@ -61,12 +62,13 @@ public class GrammarUtils {
 			this.context = context;
 		}
 	}
-	
+
 	public static interface Node {
 		public abstract List<Node> getChildren();
 		public abstract NodeData getData();
+		public abstract String toPrettyString(boolean isHex);
 	}
-	
+
 	public static class ConstantNode implements Node {
 		private final NodeData data;
 		public ConstantNode(NodeData data) {
@@ -78,11 +80,14 @@ public class GrammarUtils {
 		public NodeData getData() {
 			return this.data;
 		}
-		public String toString() {
+        public String toString() {
 			return this.data.example;
 		}
+        public String toPrettyString(boolean isHex) {
+            throw new UnsupportedOperationException();
+        }
 	}
-	
+
 	public static class MultiConstantNode implements Node {
 		private final NodeData data;
 		public final List<Set<Character>> characterOptions = new ArrayList<Set<Character>>();
@@ -105,7 +110,7 @@ public class GrammarUtils {
 		public NodeData getData() {
 			return this.data;
 		}
-		public String toString() {
+        public String toString() {
 			StringBuilder sb = new StringBuilder();
 			for(Set<Character> characterOption : this.characterOptions) {
 				sb.append("(");
@@ -116,8 +121,27 @@ public class GrammarUtils {
 			}
 			return sb.toString();
 		}
+        public String toPrettyString(boolean isHex) {
+            StringBuilder sb = new StringBuilder();
+            for(Set<Character> characterOption : this.characterOptions) {
+                if (characterOption.size() == 1) {
+                    sb.append("@|green ").append(isHex ? String.format("%02x", (int) characterOption.iterator().next())
+                        : characterOption.iterator().next()).append("|@");
+                } else if (characterOption.size() == CharacterUtils.getInstance().getNumberOfCharacters()) {
+                    sb.append("_");
+                } else {
+                    sb.append("(");
+                    for(char character : characterOption) {
+                        sb.append("@|green ").append(isHex ? String.format("%02x", (int) character) : character)
+                            .append("|@+");
+                    }
+                    sb.replace(sb.length()-1, sb.length(), ")");
+                }
+            }
+            return sb.toString();
+        }
 	}
-	
+
 	public static class AlternationNode implements Node {
 		private final NodeData data;
 		public final Node first;
@@ -137,10 +161,13 @@ public class GrammarUtils {
 			return this.data;
 		}
 		public String toString() {
-			return "(" + this.first.toString() + ")+(" + this.second.toString(); 
+			return "(" + this.first.toString() + ")+(" + this.second.toString();
 		}
+        public String toPrettyString(boolean isHex) {
+            throw new UnsupportedOperationException();
+        }
 	}
-	
+
 	public static class MultiAlternationNode implements Node {
 		private final NodeData data;
 		private final List<Node> children = new ArrayList<Node>();
@@ -163,8 +190,15 @@ public class GrammarUtils {
 			}
 			return sb.substring(0, sb.length()-1);
 		}
+        public String toPrettyString(boolean isHex) {
+            StringBuilder sb = new StringBuilder();
+            for(Node child : this.children) {
+                sb.append("@|blue (|@").append(child.toPrettyString(isHex)).append("@|blue )|@@|blue +|@");
+            }
+            return sb.substring(0, sb.length()-10);
+        }
 	}
-	
+
 	public static class RepetitionNode implements Node {
 		private final NodeData data;
 		public final Node start;
@@ -189,8 +223,11 @@ public class GrammarUtils {
 		public String toString() {
 			return this.start.toString() + "(" + this.rep.toString() + ")*" + this.end.toString();
 		}
+        public String toPrettyString(boolean isHex) {
+            return this.start.toString() + "@|red (|@" + this.rep.toPrettyString(isHex) + "@|red )*|@" + this.end.toString();
+        }
 	}
-	
+
 	public static class NodeMerges {
 		private final MultivalueMap<Node,Node> merges = new MultivalueMap<Node,Node>();
 		public void add(Node first, Node second) {
@@ -214,27 +251,27 @@ public class GrammarUtils {
 			return this.merges.get(first).contains(second);
 		}
 	}
-	
+
 	private static void getAllNodesHelper(Node root, List<Node> nodes) {
 		nodes.add(root);
 		for(Node child : root.getChildren()) {
 			getAllNodesHelper(child, nodes);
 		}
 	}
-	
+
 	public static List<Node> getAllNodes(Node root) {
 		List<Node> nodes = new ArrayList<Node>();
 		getAllNodesHelper(root, nodes);
 		return nodes;
 	}
-	
+
 	private static void getDescendantsHelper(Node node, List<Node> descendants) {
 		descendants.add(node);
 		for(Node child : node.getChildren()) {
 			getDescendantsHelper(child, descendants);
 		}
 	}
-	
+
 	public static List<Node> getDescendants(Node node) {
 		List<Node> descendants = new ArrayList<Node>();
 		getDescendantsHelper(node, descendants);

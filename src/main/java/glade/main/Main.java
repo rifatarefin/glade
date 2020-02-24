@@ -14,236 +14,282 @@
 
 package glade.main;
 
-import glade.constants.Files;
-import glade.grammar.fuzz.GrammarFuzzer.SampleParameters;
-import glade.main.Settings.FuzzSettings;
-import glade.main.Settings.Fuzzer;
-import glade.main.Settings.GrammarSettings;
-import glade.main.Settings.Program;
-import glade.main.Settings.ProgramSettings;
-import glade.util.Log;
 
+import glade.grammar.fuzz.GrammarFuzzer.GrammarMutationSampler;
+import glade.grammar.fuzz.GrammarFuzzer.SampleParameters;
+import glade.grammar.GrammarUtils.Grammar;
+import glade.grammar.synthesize.GrammarSynthesis;
+import glade.util.CharacterUtils;
+import glade.util.Log;
+import glade.util.OracleUtils.DiscriminativeOracle;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class Main {
-	public static GrammarSettings getDefaultGrammarSettings() {
-		return new GrammarSettings(Files.GRAMMAR_PATH);
-	}
-	
-	public static SampleParameters getDefaultSampleParameters() {
-		return new SampleParameters(new double[]{0.2, 0.2, 0.2, 0.4}, 0.8, 0.1, 100);
-	}
-	
-	public static FuzzSettings getDefaultFuzzSettings(Random random, Fuzzer fuzzer) {
-		return new FuzzSettings(20, 10, 1000, getDefaultSampleParameters(), fuzzer);
-	}
-	
-	private static boolean runTest(ProgramSettings program, String example) {
-		if(ProgramDataUtils.getQueryOracle(program.data).query(example)) {
-			Log.info("TEST PASSED!");
-			return true;
-		} else {
-			Log.info("TEST FAILED!");
-			Log.info("ERROR:");
-			Log.info(program.data.getOracle().execute(example));
-			return false;
-		}
-	}
-	
-	public static class IntPair {
-		public final int pass;
-		public final int fail;
-		public IntPair(int pass, int fail) {
-			this.pass = pass;
-			this.fail = fail;
-		}
-	}
-	
-	public static IntPair runTest(ProgramSettings program) {
-		Log.info("TESTING PROGRAM: " + program.name);
-		int pass = 0;
-		int fail = 0;
-		for(String example : program.examples.getEmptyExamples()) {
-			Log.info("TESTING EMPTY EXAMPLE:");
-			Log.info(example);
-			if(runTest(program, example)) {
-				pass++;
-			} else {
-				fail++;
-			}
-		}
-		for(String example : program.examples.getTrainExamples()) {
-			Log.info("TESTING TRAINING EXAMPLE:");
-			Log.info(example);
-			if(runTest(program, example)) {
-				pass++;
-			} else {
-				fail++;
-			}
-		}
-		return new IntPair(pass, fail);
-	}
-	
-	public static void runLearn(ProgramSettings program, GrammarSettings grammar) {
-		GrammarDataUtils.learnAllGrammar(grammar.grammarPath, program.name, program.data, program.examples);
-	}
-	
-	public static void runFuzz(ProgramSettings program, GrammarSettings grammar, FuzzSettings fuzz, Random random) {
-		Iterable<String> samples = fuzz.fuzzer.getSamples(program, grammar, fuzz, random);
-		int pass = 0;
-		int count = 0;
-		for(String sample : samples) {
-			Log.info("SAMPLE:");
-			Log.info(sample);
-			if(ProgramDataUtils.getQueryOracle(program.data).query(sample)) {
-				Log.info("PASS\n");
-				pass++;
-			} else {
-				Log.info("FAIL\n");
-			}
-			count++;
-			if(count >= fuzz.numIters) {
-				break;
-			}
-		}
-		Log.info("PASS RATE: " + (float)pass/fuzz.numIters);
-	}
-	
-	public static void usage() {
-		System.out.println("usage: java -jar glade.jar -mode [learn|fuzz|test] [-program [sed|grep|flex|xml|python|python-wrapped]] [-fuzzer [grammar|combined]] [-log <filename>] [-verbose]");
-		System.out.println("note: -program option required if mode=learn or mode=fuzz");
-		System.out.println("note: -fuzzer option required if mode=fuzz");
-		System.out.println("note: -log defaults to log.txt");
-		System.exit(0);
-	}
-	
-	private static Program getProgram(String programName) {
-		if(programName == null) { usage(); }
-		if(programName.equals("sed")) {
-			return Program.SED;
-		} else if(programName.equals("grep")) {
-			return Program.GREP;
-		} else if(programName.equals("flex")) {
-			return Program.FLEX;
-		} else if(programName.equals("xml")) {
-			return Program.XML;
-		} else if(programName.equals("python")) {
-			return Program.PYTHON;
-		} else if(programName.equals("python-wrapped")) {
-			return Program.PYTHON_WRAPPED;
-		} else {
-			usage();
-			return null;
-		}
-	}
-	
-	private static Fuzzer getFuzzer(String fuzzerName) {
-		if(fuzzerName == null) { usage(); }
-		if(fuzzerName.equals("grammar")) {
-			return Fuzzer.GRAMMAR;
-		} else if(fuzzerName.equals("combined")) {
-			return Fuzzer.COMBINED;
-		} else {
-			usage();
-			return null;
-		}
-	}
-	
-	public static void run(String[] args) {
-		String mode = null;
-		String programName = null;
-		String fuzzerName = null;
-		String logName = null;
-		boolean verbose = false;
-		
-		int i = 0;
-		while(i < args.length) {
-			if(args[i].equals("-mode")) {
-				if(mode != null) { usage(); }
-				i++;
-				mode = args[i];
-			} else if(args[i].equals("-program")) {
-				if(programName != null) { usage(); }
-				i++;
-				programName = args[i];
-			} else if(args[i].equals("-fuzzer")) {
-				if(fuzzerName != null) { usage(); }
-				i++;
-				fuzzerName = args[i];
-			} else if(args[i].equals("-log")) {
-				if(logName != null) { usage(); }
-				i++;
-				logName = args[i];
-			} else if(args[i].equals("-verbose")) {
-				verbose = true;
-			} else {
-				usage();
-			}
-			
-			i++;
-		}
-		
-		try {
-			if(mode == null) { usage(); }
-			
-			if(logName == null) {
-				logName = "log.txt";
-			}
-			Log.init(logName, verbose);
-			
-			if(mode.equals("test")) {
-				int pass = 0;
-				int fail = 0;
-				List<Program> programs = new ArrayList<Program>();
-				if(programName == null) {
-					programs.addAll(Arrays.asList(new Program[]{Program.SED, Program.GREP, Program.FLEX, Program.XML, Program.PYTHON, Program.PYTHON_WRAPPED}));
-				} else {
-					programs.add(getProgram(programName));
-				}
-				List<String> passedPrograms = new ArrayList<String>();
-				List<String> failedPrograms = new ArrayList<String>();
-				for(Program program : programs) {
-					IntPair curResults = runTest(program.getSettings());
-					(curResults.fail == 0 ? passedPrograms : failedPrograms).add(program.getSettings().name);
-					pass += curResults.pass;
-					fail += curResults.fail;
-				}
-				int total = pass + fail;
-				Log.info("PASSED: " + pass + "/" + total);
-				Log.info("FAILED: " + fail + "/" + total);
-				Log.info("PROGRAMS PASSED:");
-				for(String passedProgram : passedPrograms) {
-					Log.info(passedProgram);
-				}
-				Log.info("PROGRAMS FAILED:");
-				for(String failedProgram : failedPrograms) {
-					Log.info(failedProgram);
-				}
-			} else if(mode.equals("learn")) {
-				GrammarSettings grammarSettings = getDefaultGrammarSettings();
-				Program program = getProgram(programName);
-				long time = System.currentTimeMillis();
-				runLearn(program.getSettings(), grammarSettings);
-				Log.info("TOTAL TIME: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
-			} else if(mode.equals("fuzz")) {
-				Random random = new Random();
-				GrammarSettings grammarSettings = getDefaultGrammarSettings();
-				Program program = getProgram(programName);
-				Fuzzer fuzzer = getFuzzer(fuzzerName);
-				FuzzSettings fuzzerSettings = getDefaultFuzzSettings(random, fuzzer);
-				runFuzz(program.getSettings(), grammarSettings, fuzzerSettings, random);
-			} else {
-				usage();
-			}
-		} catch(Exception e) {
-			Log.err(e);
-		}
-	}
-	
-	public static void main(String[] args) {
-		run(args);
-	}
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
+import picocli.CommandLine.ParentCommand;
+import picocli.CommandLine.Help.Ansi;
+
+
+@Command(name = "glade", mixinStandardHelpOptions = true, version = "1.0",
+    subcommands = {Learn.class, Fuzz.class, Print.class})
+public class Main implements Callable<Integer> {
+
+    @Option(names = {"--log"}, defaultValue = "INFO", description = "logging level")
+    private Log.Level level;
+
+    @Override
+    public Integer call() {
+        initGlade();
+        Log.debug("Starting command glade");
+        System.err.println("Please invoke a subcommand");
+        CommandLine cmd = new CommandLine(this);
+        cmd.usage(System.err);
+        return cmd.getCommandSpec().exitCodeOnInvalidInput();
+    }
+
+    public void initGlade() {
+        Log.init(System.out, level);
+    }
+
+    public static void main(String ... args) {
+        System.exit(new CommandLine(new Main()).execute(args));
+    }
+}
+
+@Command(name = "learn", description = "Learn grammar")
+class Learn implements Callable<Integer> {
+
+    @ParentCommand
+    private Main parent;
+
+    @Parameters(description = {"Each {} in command will be substituted with query.",
+        "Whenever {} is not in command, the query is sent to standard input."})
+    private String command;
+
+    @Option(names = {"-o", "--output"}, description = "output, grammar file")
+    private String outputFile;
+
+    @Option(names = {"-i", "--input"}, defaultValue = "inputs", description = "folder with seed inputs")
+    private Path inputFolder;
+
+    @Option(names = {"-l", "--length"}, description = "max length of an input")
+    private Integer maxLength;
+
+    @Option(names = {"-f", "--fixed_length"}, description = "fixed length of an input")
+    private Integer fixedLength;
+
+    @Option(names = {"-c", "--characters"}, defaultValue = "128", description = "number of characters in input alphabet")
+    private int numberOfCharacters;
+
+    @Override
+    public Integer call() {
+        Log.debug("Starting subcommand learn");
+        parent.initGlade();
+        CharacterUtils.getInstance().init(numberOfCharacters);
+        List<String> seedInputs = new ArrayList<>();
+        try (Stream<Path> walk = Files.walk(inputFolder)) {
+            walk.filter(Files::isRegularFile).forEach(p -> {
+                try {
+                    Log.debug("Reading seed input from " + p);
+                    String seed = new String(Files.readAllBytes(p));
+
+                    StringBuilder sb = new StringBuilder();
+                    seed.chars().forEach(c -> sb.append(String.format("%02x", c)));
+                    Log.info("Adding new seed input: " + seed + " (hex: " + sb.toString() + ")");
+                    seedInputs.add(seed);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Error when reading seed input from file: " + p, e);
+                }
+            });
+        } catch (IOException e) {
+            System.err.println("Error when reading from input folder: " + inputFolder);
+            return new CommandLine(this).getCommandSpec().exitCodeOnInvalidInput();
+        }
+        if (seedInputs.isEmpty()) {
+            System.err.println("Error: input folder is empty");
+            return new CommandLine(this).getCommandSpec().exitCodeOnInvalidInput();
+        }
+        Log.debug("Creating oracle");
+        DiscriminativeOracle oracle = new Oracle(command, maxLength, fixedLength);
+        Log.info("Learning grammar");
+        Grammar grammar = GrammarSynthesis.getGrammarMultiple(seedInputs, oracle);
+        if(outputFile == null) {
+            outputFile = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm").format(LocalDateTime.now()) + ".gram";
+        }
+        Log.info("Saving grammar to " + outputFile);
+        GrammarDataUtils.saveGrammar(outputFile, grammar);
+        return 0;
+    }
+}
+
+@CommandLine.Command(name = "fuzz", description = "Fuzz using grammar")
+class Fuzz implements Callable<Integer> {
+
+    @ParentCommand
+    private Main parent;
+
+    @Parameters
+    private String command;
+
+    @Option(names = {"-i", "--input"}, required = true, description = "input grammar")
+    private String input;
+
+    @Option(names = {"-c", "--count"}, defaultValue = "15", description = "number of generated inputs")
+    private int count;
+
+    @Option(names = {"-l", "--length"}, defaultValue = "256", description = "max length of an input")
+    private Integer maxLength;
+
+    @Option(names = {"-f", "--fixed_length"}, description = "fixed length of an input")
+    private Integer fixedLength;
+
+    @Option(names = {"-s", "--seed"}, defaultValue = "0", description = "seed for random number generator")
+    private int seed;
+
+    @Option(names = {"-m", "--mutations"}, defaultValue = "40", description = "number of mutations to seed input")
+    private int numMut;
+
+    @Option(names = {"-d", "--distribution"}, split = "," ,defaultValue = "0.2,0.2,0.2,0.4",
+        description = "multinomial distribution of repetitions")
+    private double[] distribution;
+
+    @Option(names = {"-r", "--recursion"}, defaultValue = "0.2", description = "probability of using recursive production")
+    private double recursionProbability;
+
+    @Option(names = {"-h", "--hex"}, description = "print in hexadecimal")
+    private boolean isHex;
+
+    @Override
+    public Integer call() {
+        Log.debug("Starting subcommand fuzz");
+        parent.initGlade();
+
+        Log.debug("Creating oracle");
+        DiscriminativeOracle oracle = new Oracle(command, maxLength, fixedLength);
+
+        Log.info("Loading grammar from " + input);
+        Grammar grammar = GrammarDataUtils.loadGrammar(input);
+
+        Log.debug("Creating samples");
+        Iterable<String> samples = new GrammarMutationSampler(grammar,
+            new SampleParameters(distribution, recursionProbability, 1, 200),
+            maxLength, numMut, new Random(seed));
+
+        int pass = 0;
+        int processed = 0;
+        for(String sample : samples) {
+            System.out.print("Input: ");
+            if (isHex) {
+                sample.chars().forEach(c -> System.out.printf("%02x", c));
+            } else {
+                System.out.print(sample);
+            }
+            System.out.println();
+            if(oracle.query(sample)) {
+                System.out.println(Ansi.AUTO.string("@|green pass|@"));
+                pass++;
+            } else {
+                System.out.println(Ansi.AUTO.string("@|red fail|@"));
+            }
+            System.out.println();
+
+            processed++;
+            if(processed >= count) {
+                break;
+            }
+        }
+        System.out.println("Pass rate: " + (float) pass / count);
+        return 0;
+    }
+}
+
+@Command(name = "print", description = "Print grammar")
+class Print implements Callable<Integer> {
+
+    @ParentCommand
+    private Main parent;
+
+    @Parameters
+    private String grammar;
+
+    @Option(names = {"-h", "--hex"}, description = "print in hexadecimal")
+    private boolean isHex;
+
+    @Option(names = {"-c", "--characters"}, defaultValue = "128", description = "number of characters in input alphabet")
+    private int numberOfCharacters;
+
+    @Override
+    public Integer call() {
+        Log.debug("Starting subcommand print");
+        parent.initGlade();
+        CharacterUtils.getInstance().init(numberOfCharacters);
+        Grammar grammar = GrammarDataUtils.loadGrammar(this.grammar);
+        System.out.println(Ansi.AUTO.string(grammar.node.toPrettyString(isHex)));
+        return 0;
+    }
+}
+
+class Oracle implements DiscriminativeOracle {
+    private String command;
+    private Integer maxLength;
+    private Integer fixedLength;
+
+    Oracle(String command, Integer maxLength, Integer fixedLength) {
+        this.command = command;
+        this.maxLength = maxLength;
+        this.fixedLength = fixedLength;
+    }
+
+    public boolean query(String query) {
+        if (maxLength != null && query.length() > maxLength) {
+            return false;
+        }
+        if (fixedLength != null && query.length() != fixedLength) {
+            return false;
+        }
+        StringBuilder sb = new StringBuilder();
+        query.chars().forEach(c -> sb.append(String.format("%02x", c)));
+        Log.debug("Oracle input: " + query + " (hex: " + sb.toString() + ")");
+        try {
+            Process p;
+            if (command.contains("{}")) {
+                if (query.contains("\0")) { // Command arguments can't contain null bytes.
+                    Log.debug("Oracle failed because the query contains a null byte.");
+                    return false;
+                }
+                p = Runtime.getRuntime().exec(command.replace("{}", query));
+            } else {
+                p = Runtime.getRuntime().exec(command);
+                for (char c : query.toCharArray()) {
+                    p.getOutputStream().write(c);
+                }
+                p.getOutputStream().close();
+            }
+
+            Log.debug("Oracle output: " + new BufferedReader(new InputStreamReader(p.getInputStream()))
+                .lines().collect(Collectors.joining("\n")));
+
+            p.waitFor();
+
+            Log.debug("Oracle exit value: " + p.exitValue());
+            return p.exitValue() == 0;
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 }
