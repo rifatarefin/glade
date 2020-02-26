@@ -35,8 +35,14 @@ public class Log {
 
     private static OutputStream outputStream = null;
 	private static Level loggingLevel = Level.OFF;
+	private static CommandLine.Help.Ansi ansi;
 
 	public static void init(OutputStream outputStream, Level loggingLevel) {
+	    if (outputStream == System.out) {
+	        ansi = CommandLine.Help.Ansi.AUTO;
+        } else {
+	        ansi = CommandLine.Help.Ansi.OFF;
+        }
 		Log.outputStream = outputStream;
 		Log.loggingLevel = loggingLevel;
 	}
@@ -56,10 +62,10 @@ public class Log {
     private static void writeLog(Level level, String message) {
         if (loggingLevel.ordinal() >= level.ordinal()) {
             try {
-                outputStream.write(CommandLine.Help.Ansi.AUTO.string(
+                outputStream.write(ansi.string(
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS").format(LocalDateTime.now())
                         + " - @|" + level.color + " " + level + "|@ - " + message + "\n")
-                    .getBytes(StandardCharsets.UTF_8)); // TODO test this with files
+                    .getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }

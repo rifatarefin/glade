@@ -23,9 +23,7 @@ import glade.util.CharacterUtils;
 import glade.util.Log;
 import glade.util.OracleUtils.DiscriminativeOracle;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -52,6 +50,11 @@ public class Main implements Callable<Integer> {
     @Option(names = {"--log"}, defaultValue = "INFO", description = "logging level")
     private Log.Level level;
 
+    @Option(names = {"-f", "--file"}, description = "file for logging")
+    private File logFile;
+
+    private static OutputStream out;
+
     @Override
     public Integer call() {
         initGlade();
@@ -63,11 +66,32 @@ public class Main implements Callable<Integer> {
     }
 
     public void initGlade() {
-        Log.init(System.out, level);
+        if (logFile != null) {
+            try {
+                out = new FileOutputStream(logFile);
+                Log.init(out, level);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                System.exit(new CommandLine(this).getCommandSpec()
+                    .exitCodeOnExecutionException());
+            }
+        } else {
+            Log.init(System.out, level);
+        }
     }
 
     public static void main(String ... args) {
-        System.exit(new CommandLine(new Main()).execute(args));
+        int returnValue = new CommandLine(new Main()).execute(args);
+        if (out != null) {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(new CommandLine(new Main()).getCommandSpec()
+                    .exitCodeOnExecutionException());
+            }
+        }
+        System.exit(returnValue);
     }
 
     /**
