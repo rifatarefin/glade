@@ -25,6 +25,7 @@ import glade.grammar.ParseTreeUtils;
 import glade.grammar.ParseTreeUtils.ParseTreeMultiConstantNode;
 import glade.grammar.ParseTreeUtils.ParseTreeNode;
 import glade.grammar.ParseTreeUtils.ParseTreeRepetitionNode;
+import glade.util.CharacterUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -298,7 +299,8 @@ public class GrammarFuzzer {
 	}
 
 	private static char nextChar(Random random) {
-		return (char)random.nextInt(128); // TODO change bound value
+	    // TODO initialize CharacterUtils for combined fuzzing (safe numberOfCharacters to grammar)
+		return (char)random.nextInt(CharacterUtils.getInstance().getNumberOfCharacters());
 	}
 
 	// performs a single edit to the string

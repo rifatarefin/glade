@@ -1,4 +1,7 @@
 # -*- mode: gitignore; -*-
+#################### Glade
+/inputs/
+*.gram
 
 #################### Gradle
 .gradle

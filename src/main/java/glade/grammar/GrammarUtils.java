@@ -224,7 +224,8 @@ public class GrammarUtils {
 			return this.start.toString() + "(" + this.rep.toString() + ")*" + this.end.toString();
 		}
         public String toPrettyString(boolean isHex) {
-            return this.start.toString() + "@|red (|@" + this.rep.toPrettyString(isHex) + "@|red )*|@" + this.end.toString();
+            return this.start.toPrettyString(isHex) + "@|red (|@" + this.rep.toPrettyString(isHex) + "@|red )*|@"
+                + this.end.toPrettyString(isHex);
         }
 	}
 

@@ -69,6 +69,27 @@ public class Main implements Callable<Integer> {
     public static void main(String ... args) {
         System.exit(new CommandLine(new Main()).execute(args));
     }
+
+    /**
+     * @see <a href="https://github.com/remkop/picocli/issues/832">this related issue</a>
+     */
+    static int[] parseAllowedLength(String allowedLength) {
+        if (allowedLength == null) {
+            return new int[]{};
+        }
+        if (!allowedLength.contains("-")) {
+            return new int[]{Integer.parseInt(allowedLength)};
+        }
+        if (allowedLength.indexOf("-") == allowedLength.lastIndexOf("-")) {
+            String[] lengthRange = allowedLength.split("-");
+            int[] parsedLength = new int[]{Integer.parseInt(lengthRange[0]), Integer.parseInt(lengthRange[1])};
+            if (parsedLength[0] > parsedLength[1]) {
+                throw new IllegalArgumentException("Invalid range for \"allowedLength\".");
+            }
+            return parsedLength;
+        }
+        throw new IllegalArgumentException("\"allowedLength\" contains more than one dash.");
+    }
 }
 
 @Command(name = "learn", description = "Learn grammar")
@@ -87,20 +108,18 @@ class Learn implements Callable<Integer> {
     @Option(names = {"-i", "--input"}, defaultValue = "inputs", description = "folder with seed inputs")
     private Path inputFolder;
 
-    @Option(names = {"-l", "--length"}, description = "max length of an input")
-    private Integer maxLength;
-
-    @Option(names = {"-f", "--fixed_length"}, description = "fixed length of an input")
-    private Integer fixedLength;
+    @Option(names = {"-l", "--length"}, description = "allowed length of an input")
+    private String allowedLength;
 
     @Option(names = {"-c", "--characters"}, defaultValue = "128", description = "number of characters in input alphabet")
     private int numberOfCharacters;
 
     @Override
     public Integer call() {
-        Log.debug("Starting subcommand learn");
         parent.initGlade();
+        Log.debug("Starting subcommand learn");
         CharacterUtils.getInstance().init(numberOfCharacters);
+        int[] allowedLength = Main.parseAllowedLength(this.allowedLength);
         List<String> seedInputs = new ArrayList<>();
         try (Stream<Path> walk = Files.walk(inputFolder)) {
             walk.filter(Files::isRegularFile).forEach(p -> {
@@ -109,7 +128,7 @@ class Learn implements Callable<Integer> {
                     String seed = new String(Files.readAllBytes(p));
 
                     StringBuilder sb = new StringBuilder();
-                    seed.chars().forEach(c -> sb.append(String.format("%02x", c)));
+                    seed.chars().forEach(c -> sb.append(String.format("%02x", c))); // TODO extract this (probably to Log class)
                     Log.info("Adding new seed input: " + seed + " (hex: " + sb.toString() + ")");
                     seedInputs.add(seed);
                 } catch (IOException e) {
@@ -125,7 +144,7 @@ class Learn implements Callable<Integer> {
             return new CommandLine(this).getCommandSpec().exitCodeOnInvalidInput();
         }
         Log.debug("Creating oracle");
-        DiscriminativeOracle oracle = new Oracle(command, maxLength, fixedLength);
+        DiscriminativeOracle oracle = new Oracle(command, allowedLength);
         Log.info("Learning grammar");
         Grammar grammar = GrammarSynthesis.getGrammarMultiple(seedInputs, oracle);
         if(outputFile == null) {
@@ -152,11 +171,8 @@ class Fuzz implements Callable<Integer> {
     @Option(names = {"-c", "--count"}, defaultValue = "15", description = "number of generated inputs")
     private int count;
 
-    @Option(names = {"-l", "--length"}, defaultValue = "256", description = "max length of an input")
-    private Integer maxLength;
-
-    @Option(names = {"-f", "--fixed_length"}, description = "fixed length of an input")
-    private Integer fixedLength;
+    @Option(names = {"-l", "--length"}, description = "allowed length of an input")
+    private String allowedLength;
 
     @Option(names = {"-s", "--seed"}, defaultValue = "0", description = "seed for random number generator")
     private int seed;
@@ -176,15 +192,22 @@ class Fuzz implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Log.debug("Starting subcommand fuzz");
         parent.initGlade();
+        Log.debug("Starting subcommand fuzz");
+        int[] allowedLength = Main.parseAllowedLength(this.allowedLength);
 
         Log.debug("Creating oracle");
-        DiscriminativeOracle oracle = new Oracle(command, maxLength, fixedLength);
+        DiscriminativeOracle oracle = new Oracle(command, allowedLength);
 
         Log.info("Loading grammar from " + input);
         Grammar grammar = GrammarDataUtils.loadGrammar(input);
 
+        int maxLength;
+        if (allowedLength.length == 2) {
+            maxLength = allowedLength[1];
+        } else {
+            maxLength = Integer.MAX_VALUE;
+        }
         Log.debug("Creating samples");
         Iterable<String> samples = new GrammarMutationSampler(grammar,
             new SampleParameters(distribution, recursionProbability, 1, 200),
@@ -235,8 +258,8 @@ class Print implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Log.debug("Starting subcommand print");
         parent.initGlade();
+        Log.debug("Starting subcommand print");
         CharacterUtils.getInstance().init(numberOfCharacters);
         Grammar grammar = GrammarDataUtils.loadGrammar(this.grammar);
         System.out.println(Ansi.AUTO.string(grammar.node.toPrettyString(isHex)));
@@ -246,25 +269,25 @@ class Print implements Callable<Integer> {
 
 class Oracle implements DiscriminativeOracle {
     private String command;
-    private Integer maxLength;
-    private Integer fixedLength;
+    private int[] allowedLength;
 
-    Oracle(String command, Integer maxLength, Integer fixedLength) {
+    Oracle(String command, int[] allowedLength) {
         this.command = command;
-        this.maxLength = maxLength;
-        this.fixedLength = fixedLength;
+        this.allowedLength = allowedLength;
     }
 
     public boolean query(String query) {
-        if (maxLength != null && query.length() > maxLength) {
-            return false;
-        }
-        if (fixedLength != null && query.length() != fixedLength) {
-            return false;
-        }
         StringBuilder sb = new StringBuilder();
         query.chars().forEach(c -> sb.append(String.format("%02x", c)));
         Log.debug("Oracle input: " + query + " (hex: " + sb.toString() + ")");
+        if (allowedLength.length == 1 && query.length() != allowedLength[0]) {
+            Log.debug("Oracle failed because the query length is not equal to " + allowedLength[0] + ".");
+            return false;
+        }
+        if (allowedLength.length == 2 && (query.length() < allowedLength[0] || query.length() > allowedLength[1])) {
+            Log.debug("Oracle failed because the query length is not in " + allowedLength[0] + "-" + allowedLength[1] + ".");
+            return false;
+        }
         try {
             Process p;
             if (command.contains("{}")) {
