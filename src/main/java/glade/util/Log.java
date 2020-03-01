@@ -33,17 +33,20 @@ public class Log {
         }
     }
 
-    private static OutputStream outputStream = null;
-	private static Level loggingLevel = Level.OFF;
-	private static CommandLine.Help.Ansi ansi;
+    private static OutputStream outputStream = System.out;
+	private static Level loggingLevel = Level.INFO;
+	private static CommandLine.Help.Ansi ansi = CommandLine.Help.Ansi.AUTO;
 
-	public static void init(OutputStream outputStream, Level loggingLevel) {
-	    if (outputStream == System.out) {
-	        ansi = CommandLine.Help.Ansi.AUTO;
+	public static void setOutputStream(OutputStream outputStream) {
+        if (outputStream == System.out) {
+            ansi = CommandLine.Help.Ansi.AUTO;
         } else {
-	        ansi = CommandLine.Help.Ansi.OFF;
+            ansi = CommandLine.Help.Ansi.OFF;
         }
-		Log.outputStream = outputStream;
+        Log.outputStream = outputStream;
+    }
+
+	public static void setLoggingLevel(Level loggingLevel) {
 		Log.loggingLevel = loggingLevel;
 	}
 

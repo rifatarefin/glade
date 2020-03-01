@@ -66,7 +66,7 @@ public class GrammarUtils {
 	public static interface Node {
 		public abstract List<Node> getChildren();
 		public abstract NodeData getData();
-		public abstract String toPrettyString(boolean isHex);
+		public abstract String toAnsiString();
 	}
 
 	public static class ConstantNode implements Node {
@@ -83,7 +83,7 @@ public class GrammarUtils {
         public String toString() {
 			return this.data.example;
 		}
-        public String toPrettyString(boolean isHex) {
+        public String toAnsiString() {
             throw new UnsupportedOperationException();
         }
 	}
@@ -121,19 +121,17 @@ public class GrammarUtils {
 			}
 			return sb.toString();
 		}
-        public String toPrettyString(boolean isHex) {
+        public String toAnsiString() {
             StringBuilder sb = new StringBuilder();
             for(Set<Character> characterOption : this.characterOptions) {
                 if (characterOption.size() == 1) {
-                    sb.append("@|green ").append(isHex ? String.format("%02x", (int) characterOption.iterator().next())
-                        : characterOption.iterator().next()).append("|@");
-                } else if (characterOption.size() == CharacterUtils.getInstance().getNumberOfCharacters()) {
+                    sb.append(CharacterUtils.queryCharToAnsiString(characterOption.iterator().next()));
+                } else if (characterOption.size() == CharacterUtils.getNumberOfCharacters()) {
                     sb.append("_");
                 } else {
                     sb.append("(");
                     for(char character : characterOption) {
-                        sb.append("@|green ").append(isHex ? String.format("%02x", (int) character) : character)
-                            .append("|@+");
+                        sb.append(CharacterUtils.queryCharToAnsiString(character));
                     }
                     sb.replace(sb.length()-1, sb.length(), ")");
                 }
@@ -163,7 +161,7 @@ public class GrammarUtils {
 		public String toString() {
 			return "(" + this.first.toString() + ")+(" + this.second.toString();
 		}
-        public String toPrettyString(boolean isHex) {
+        public String toAnsiString() {
             throw new UnsupportedOperationException();
         }
 	}
@@ -190,10 +188,10 @@ public class GrammarUtils {
 			}
 			return sb.substring(0, sb.length()-1);
 		}
-        public String toPrettyString(boolean isHex) {
+        public String toAnsiString() {
             StringBuilder sb = new StringBuilder();
             for(Node child : this.children) {
-                sb.append("@|blue (|@").append(child.toPrettyString(isHex)).append("@|blue )|@@|blue +|@");
+                sb.append("@|blue (|@").append(child.toAnsiString()).append("@|blue )|@@|blue +|@");
             }
             return sb.substring(0, sb.length()-10);
         }
@@ -223,9 +221,9 @@ public class GrammarUtils {
 		public String toString() {
 			return this.start.toString() + "(" + this.rep.toString() + ")*" + this.end.toString();
 		}
-        public String toPrettyString(boolean isHex) {
-            return this.start.toPrettyString(isHex) + "@|red (|@" + this.rep.toPrettyString(isHex) + "@|red )*|@"
-                + this.end.toPrettyString(isHex);
+        public String toAnsiString() {
+            return this.start.toAnsiString() + "@|red (|@" + this.rep.toAnsiString() + "@|red )*|@"
+                + this.end.toAnsiString();
         }
 	}
 

@@ -24,6 +24,7 @@ import glade.util.Log;
 import glade.util.OracleUtils.DiscriminativeOracle;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -35,19 +36,19 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import glade.util.Utils;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
-import picocli.CommandLine.Help.Ansi;
 
 
 @Command(name = "glade", mixinStandardHelpOptions = true, version = "1.0",
     subcommands = {Learn.class, Fuzz.class, Print.class})
 public class Main implements Callable<Integer> {
 
-    @Option(names = {"--log"}, defaultValue = "INFO", description = "logging level")
+    @Option(names = {"--log"}, description = "logging level")
     private Log.Level level;
 
     @Option(names = {"-f", "--file"}, description = "file for logging")
@@ -68,15 +69,15 @@ public class Main implements Callable<Integer> {
     public void initGlade() {
         if (logFile != null) {
             try {
-                out = new FileOutputStream(logFile);
-                Log.init(out, level);
+                Log.setOutputStream(new FileOutputStream(logFile));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 System.exit(new CommandLine(this).getCommandSpec()
                     .exitCodeOnExecutionException());
             }
-        } else {
-            Log.init(System.out, level);
+        }
+        if (level != null) {
+            Log.setLoggingLevel(level);
         }
     }
 
@@ -135,25 +136,28 @@ class Learn implements Callable<Integer> {
     @Option(names = {"-l", "--length"}, description = "allowed length of an input")
     private String allowedLength;
 
-    @Option(names = {"-c", "--characters"}, defaultValue = "128", description = "number of characters in input alphabet")
-    private int numberOfCharacters;
+    @Option(names = {"-a", "--alphabet"}, defaultValue = "ASCII", description = "input alphabet")
+    private CharacterUtils.InputAlphabet inputAlphabet;
 
     @Override
     public Integer call() {
         parent.initGlade();
         Log.debug("Starting subcommand learn");
-        CharacterUtils.getInstance().init(numberOfCharacters);
+        CharacterUtils.init(inputAlphabet);
         int[] allowedLength = Main.parseAllowedLength(this.allowedLength);
         List<String> seedInputs = new ArrayList<>();
+        Log.debug("Creating oracle");
+        DiscriminativeOracle oracle = new Oracle(command, allowedLength);
         try (Stream<Path> walk = Files.walk(inputFolder)) {
             walk.filter(Files::isRegularFile).forEach(p -> {
                 try {
                     Log.debug("Reading seed input from " + p);
-                    String seed = new String(Files.readAllBytes(p));
-
-                    StringBuilder sb = new StringBuilder();
-                    seed.chars().forEach(c -> sb.append(String.format("%02x", c))); // TODO extract this (probably to Log class)
-                    Log.info("Adding new seed input: " + seed + " (hex: " + sb.toString() + ")");
+                    String seed = new String(Files.readAllBytes(p), StandardCharsets.ISO_8859_1);
+                    if (!oracle.query(seed)) {
+                        throw new IllegalArgumentException("Seed input has been rejected by oracle: "
+                            + CharacterUtils.queryToAnsiString(seed));
+                    }
+                    Log.info("Adding new seed input: " + CharacterUtils.queryToAnsiString(seed));
                     seedInputs.add(seed);
                 } catch (IOException e) {
                     throw new IllegalStateException("Error when reading seed input from file: " + p, e);
@@ -167,8 +171,6 @@ class Learn implements Callable<Integer> {
             System.err.println("Error: input folder is empty");
             return new CommandLine(this).getCommandSpec().exitCodeOnInvalidInput();
         }
-        Log.debug("Creating oracle");
-        DiscriminativeOracle oracle = new Oracle(command, allowedLength);
         Log.info("Learning grammar");
         Grammar grammar = GrammarSynthesis.getGrammarMultiple(seedInputs, oracle);
         if(outputFile == null) {
@@ -211,10 +213,8 @@ class Fuzz implements Callable<Integer> {
     @Option(names = {"-r", "--recursion"}, defaultValue = "0.2", description = "probability of using recursive production")
     private double recursionProbability;
 
-    @Option(names = {"-h", "--hex"}, description = "print in hexadecimal")
-    private boolean isHex;
-
     @Override
+    // TODO add support for combined fuzzer
     public Integer call() {
         parent.initGlade();
         Log.debug("Starting subcommand fuzz");
@@ -240,18 +240,12 @@ class Fuzz implements Callable<Integer> {
         int pass = 0;
         int processed = 0;
         for(String sample : samples) {
-            System.out.print("Input: ");
-            if (isHex) {
-                sample.chars().forEach(c -> System.out.printf("%02x", c));
-            } else {
-                System.out.print(sample);
-            }
-            System.out.println();
+            Utils.printlnAnsi("Input: " + CharacterUtils.queryToAnsiString(sample));
             if(oracle.query(sample)) {
-                System.out.println(Ansi.AUTO.string("@|green pass|@"));
+                Utils.printlnAnsi("@|green pass|@");
                 pass++;
             } else {
-                System.out.println(Ansi.AUTO.string("@|red fail|@"));
+                Utils.printlnAnsi("@|red fail|@");
             }
             System.out.println();
 
@@ -274,19 +268,12 @@ class Print implements Callable<Integer> {
     @Parameters
     private String grammar;
 
-    @Option(names = {"-h", "--hex"}, description = "print in hexadecimal")
-    private boolean isHex;
-
-    @Option(names = {"-c", "--characters"}, defaultValue = "128", description = "number of characters in input alphabet")
-    private int numberOfCharacters;
-
     @Override
     public Integer call() {
         parent.initGlade();
         Log.debug("Starting subcommand print");
-        CharacterUtils.getInstance().init(numberOfCharacters);
         Grammar grammar = GrammarDataUtils.loadGrammar(this.grammar);
-        System.out.println(Ansi.AUTO.string(grammar.node.toPrettyString(isHex)));
+        Utils.printlnAnsi(grammar.node.toAnsiString());
         return 0;
     }
 }
@@ -301,22 +288,21 @@ class Oracle implements DiscriminativeOracle {
     }
 
     public boolean query(String query) {
-        StringBuilder sb = new StringBuilder();
-        query.chars().forEach(c -> sb.append(String.format("%02x", c)));
-        Log.debug("Oracle input: " + query + " (hex: " + sb.toString() + ")");
+        Log.debug("Oracle input: " + CharacterUtils.queryToAnsiString(query));
         if (allowedLength.length == 1 && query.length() != allowedLength[0]) {
-            Log.debug("Oracle failed because the query length is not equal to " + allowedLength[0] + ".");
+            Log.debug("Oracle @|red failed|@ because the query length is not equal to " + allowedLength[0] + ".");
             return false;
         }
         if (allowedLength.length == 2 && (query.length() < allowedLength[0] || query.length() > allowedLength[1])) {
-            Log.debug("Oracle failed because the query length is not in " + allowedLength[0] + "-" + allowedLength[1] + ".");
+            Log.debug("Oracle @|red failed|@ because the query length is not in " + allowedLength[0]
+                + "-" + allowedLength[1] + ".");
             return false;
         }
         try {
             Process p;
             if (command.contains("{}")) {
                 if (query.contains("\0")) { // Command arguments can't contain null bytes.
-                    Log.debug("Oracle failed because the query contains a null byte.");
+                    Log.debug("Oracle @|red failed|@ because the query contains a null byte.");
                     return false;
                 }
                 p = Runtime.getRuntime().exec(command.replace("{}", query));
@@ -333,7 +319,7 @@ class Oracle implements DiscriminativeOracle {
 
             p.waitFor();
 
-            Log.debug("Oracle exit value: " + p.exitValue());
+            Log.debug("Oracle exit value: " + (p.exitValue() == 0 ? "@|green " : "@|red ") + p.exitValue() + "|@");
             return p.exitValue() == 0;
         } catch (Exception e) {
             throw new IllegalStateException(e);

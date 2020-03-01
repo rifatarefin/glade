@@ -14,6 +14,8 @@
 
 package glade.util;
 
+import picocli.CommandLine;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +31,7 @@ public class Utils {
 		}
 		return inverse;
 	}
-	
+
 	@SafeVarargs
 	public static <T> List<T> getList(T ... ts) {
 		List<T> tlist = new ArrayList<T>();
@@ -38,14 +40,14 @@ public class Utils {
 		}
 		return tlist;
 	}
-	
+
 	public static class MultivalueMap<K,V> extends HashMap<K,Set<V>> {
 		private static final long serialVersionUID = -6390444829513305915L;
 
 		public void add(K k, V v) {
 			ensure(k).add(v);
 		}
-		
+
 		public Set<V> ensure(K k) {
 			Set<V> vSet = super.get(k);
 			if(vSet == null) {
@@ -60,7 +62,7 @@ public class Utils {
 			return vSet == null ? new HashSet<V>() : vSet;
 		}
 	}
-	
+
 	public static class Maybe<T> {
 		private T t;
 		public Maybe(T t) {
@@ -82,4 +84,8 @@ public class Utils {
 			return this.hasT() ? this.getT() : t;
 		}
 	}
+
+    public static void printlnAnsi(String ansiString) {
+        System.out.println(CommandLine.Help.Ansi.AUTO.string(ansiString));
+    }
 }

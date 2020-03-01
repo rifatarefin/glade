@@ -24,6 +24,7 @@ import glade.grammar.GrammarUtils.Node;
 import glade.grammar.GrammarUtils.NodeData;
 import glade.grammar.GrammarUtils.NodeMerges;
 import glade.grammar.GrammarUtils.RepetitionNode;
+import glade.util.CharacterUtils;
 import glade.util.Utils;
 
 import java.io.DataInputStream;
@@ -45,7 +46,7 @@ public class GrammarSerializer {
 			}
 		}
 	}
-	
+
 	public static String deserializeString(DataInputStream dis) throws IOException {
 		int length = dis.readInt();
 		if(length == -1) {
@@ -58,7 +59,7 @@ public class GrammarSerializer {
 			return sb.toString();
 		}
 	}
-	
+
 	public static void serialize(NodeData data, DataOutputStream dos) throws IOException {
 		serialize(data.example, dos);
 		serialize(data.context.pre, dos);
@@ -66,7 +67,7 @@ public class GrammarSerializer {
 		serialize(data.context.extraPre, dos);
 		serialize(data.context.extraPost, dos);
 	}
-	
+
 	public static NodeData deserializeNodeData(DataInputStream dis) throws IOException {
 		String example = deserializeString(dis);
 		String pre = deserializeString(dis);
@@ -75,8 +76,9 @@ public class GrammarSerializer {
 		String extraPost = deserializeString(dis);
 		return new NodeData(example, new Context(new Context(), pre, post, extraPre, extraPost));
 	}
-	
+
 	public static void serialize(Grammar grammar, DataOutputStream dos) throws IOException {
+	    serialize(CharacterUtils.getInputAlphabet().toString(), dos); // serialize input alphabet
 		List<Node> nodes = GrammarUtils.getAllNodes(grammar.node);
 		Map<Node,Integer> nodeIds = Utils.getInverse(nodes);
 		dos.writeInt(nodes.size()); // 0
@@ -132,11 +134,11 @@ public class GrammarSerializer {
 			}
 		}
 	}
-	
+
 	private static interface NodeSerialization {
 		public abstract NodeData getData();
 	}
-	
+
 	private static class ConstantNodeSerialization implements NodeSerialization {
 		private final NodeData data;
 		private ConstantNodeSerialization(NodeData data) {
@@ -146,7 +148,7 @@ public class GrammarSerializer {
 			return this.data;
 		}
 	}
-	
+
 	private static class MultiConstantNodeSerialization implements NodeSerialization {
 		private final NodeData data;
 		private final List<List<Character>> characterOptions;
@@ -160,7 +162,7 @@ public class GrammarSerializer {
 			return this.data;
 		}
 	}
-	
+
 	private static class AlternationNodeSerialization implements NodeSerialization {
 		private final NodeData data;
 		private final int first;
@@ -174,7 +176,7 @@ public class GrammarSerializer {
 			return this.data;
 		}
 	}
-	
+
 	private static class MultiAlternationNodeSerialization implements NodeSerialization {
 		private final NodeData data;
 		private final List<Integer> children;
@@ -186,7 +188,7 @@ public class GrammarSerializer {
 			return this.data;
 		}
 	}
-	
+
 	private static class RepetitionNodeSerialization implements NodeSerialization {
 		private final NodeData data;
 		private final int start;
@@ -202,7 +204,7 @@ public class GrammarSerializer {
 			return this.data;
 		}
 	}
-	
+
 	private static class NodeDeserializer {
 		private final List<NodeSerialization> nodeSerializations;
 		private final List<Node> nodes;
@@ -247,8 +249,9 @@ public class GrammarSerializer {
 			return this.nodes;
 		}
 	}
-	
+
 	public static Grammar deserializeNodeWithMerges(DataInputStream dis) throws IOException {
+	    CharacterUtils.init(CharacterUtils.InputAlphabet.valueOf(deserializeString(dis))); //deserialize input alphabet
 		int numNodes = dis.readInt(); // 0
 		List<NodeSerialization> nodeSerializations = new ArrayList<NodeSerialization>(numNodes);
 		for(int i=0; i<numNodes; i++) {
@@ -311,7 +314,7 @@ public class GrammarSerializer {
 				int second = dis.readInt(); // 7
 				merges.add(nodes.get(first), nodes.get(second));
 			}
-		}		
+		}
 		return new Grammar(nodes.get(0), merges);
 	}
 }

@@ -299,8 +299,7 @@ public class GrammarFuzzer {
 	}
 
 	private static char nextChar(Random random) {
-	    // TODO initialize CharacterUtils for combined fuzzing (safe numberOfCharacters to grammar)
-		return (char)random.nextInt(CharacterUtils.getInstance().getNumberOfCharacters());
+		return (char)random.nextInt(CharacterUtils.getNumberOfCharacters());
 	}
 
 	// performs a single edit to the string
@@ -317,8 +316,8 @@ public class GrammarFuzzer {
 		}
 	}
 
-	private  static String nextStringMutant(String string, int numMutantions, Random random) {
-		for(int i=0; i<numMutantions; i++) {
+	private  static String nextStringMutant(String string, int numMutations, Random random) {
+		for(int i=0; i<numMutations; i++) {
 			string = nextStringMutant(string, random);
 		}
 		return string;

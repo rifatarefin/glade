@@ -17,16 +17,6 @@ package glade.util;
 import java.util.*;
 
 public class CharacterUtils {
-    private static CharacterUtils instance;
-
-    private CharacterUtils() {}
-
-    public static CharacterUtils getInstance() {
-        if (instance == null) {
-            instance = new CharacterUtils();
-        }
-        return instance;
-    }
 
     public static class CharacterGeneralization {
 		public final Set<Character> triggers;
@@ -39,30 +29,82 @@ public class CharacterUtils {
 		}
 	}
 
-    private Integer numberOfCharacters;
-	private List<CharacterGeneralization> generalizations;
+    private static InputAlphabet inputAlphabet;
+    private static List<CharacterGeneralization> generalizations;
+    private static boolean isInitialized = false;
 
-    public void init(int numberOfCharacters) {
-        this.numberOfCharacters = numberOfCharacters;
+    // TODO add here logic for ASCII from old GLADE implementation
+    public static void init(InputAlphabet inputAlphabet) {
+        if (isInitialized) {
+            throw new IllegalStateException("\"CharacterUtils\" are already initialized.");
+        }
+        isInitialized = true;
+
+        CharacterUtils.inputAlphabet = inputAlphabet;
 
         List<CharacterGeneralization> generalizations = new ArrayList<>();
         List<Character> allCharacters = new ArrayList<>();
 
-        for (char c = 0; c < numberOfCharacters; c++) {
+        for (char c = 0; c < getNumberOfCharacters(); c++) {
             allCharacters.add(c);
         }
         for (char c : allCharacters) {
             List<Character> curC = Utils.getList(c);
             generalizations.add(new CharacterGeneralization(allCharacters, curC, curC));
         }
-        this.generalizations = Collections.unmodifiableList(generalizations);
+        CharacterUtils.generalizations = Collections.unmodifiableList(generalizations);
     }
 
-	public List<CharacterGeneralization> getGeneralizations() {
+	public static List<CharacterGeneralization> getGeneralizations() {
+        checkIfInitialized();
 		return generalizations;
 	}
 
-    public int getNumberOfCharacters() {
-        return numberOfCharacters;
+    public static int getNumberOfCharacters() {
+        checkIfInitialized();
+        return inputAlphabet.numberOfCharacters;
+    }
+
+    public static String queryToAnsiString(String input) {
+        checkIfInitialized();
+        StringBuilder sb = new StringBuilder();
+        for (char ch: input.toCharArray()) {
+            sb.append(queryCharToAnsiString(ch));
+        }
+        return sb.toString();
+    }
+
+    public static String queryCharToAnsiString(char ch) {
+        checkIfInitialized();
+        switch (inputAlphabet) {
+            case ASCII:
+                if (Character.isISOControl(ch)) {
+                    return String.format("@|magenta \\x%02x|@", (int) ch);
+                }
+                return "@|yellow " + ch + "|@";
+            case BYTE:
+                return String.format("@|yellow %02x|@", (int) ch);
+            default:
+                throw new IllegalStateException("This method doesn't support used input alphabet.");
+        }
+    }
+
+    private static void checkIfInitialized() {
+        if (!isInitialized) {
+            throw new IllegalStateException("\"CharacterUtils\" are not initialized.");
+        }
+    }
+
+    public static InputAlphabet getInputAlphabet() {
+        return inputAlphabet;
+    }
+
+    public enum InputAlphabet {
+        ASCII(128), BYTE(256);
+        public final int numberOfCharacters;
+
+        InputAlphabet(int numberOfCharacters) {
+            this.numberOfCharacters = numberOfCharacters;
+        }
     }
 }

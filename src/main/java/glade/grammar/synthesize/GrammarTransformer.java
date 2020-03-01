@@ -89,7 +89,7 @@ public class GrammarTransformer {
 			Context curContext = new Context(context, example.substring(0, i), example.substring(i+1), example.substring(0, i), example.substring(i+1));
 			characterOption.add(curC);
 			characterCheck.add(curC);
-			for(CharacterGeneralization generalization : CharacterUtils.getInstance().getGeneralizations()) {
+			for(CharacterGeneralization generalization : CharacterUtils.getGeneralizations()) {
 				if(generalization.triggers.contains(curC)) {
 					List<String> checks = new ArrayList<String>();
 					for(char c : generalization.checks) {
