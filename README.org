@@ -1,0 +1,83 @@
+* GLADE
+  GLADE is a tool for automatically synthesizing program input grammars, i.e., a
+  context-free grammar encoding the language of valid inputs for a target
+  program. GLADE requires two inputs: (i) an query oracle that responds whether
+  a given input is valid for the target program, and (ii) a set of examples of
+  valid inputs, known as seed inputs. From these inputs, GLADE produces a
+  grammar that can be sampled to produce new program inputs.
+
+  For a detailed introduction to GLADE, see:
+  - [[http://arxiv.org/abs/1608.01723][ *Synthesizing Program Input Grammars* ]]
+** Instalation
+   First of all, clone this repository:
+   #+BEGIN_SRC sh
+   git clone 'https://github.com/kuhy/glade'
+   #+END_SRC
+   Then you can build and execute GLADE using provided Gradle wrapper:
+   #+BEGIN_SRC sh
+   ./gradlew run --args='some arguments'
+   #+END_SRC
+   Or if you have GraalVM Native Image installed, you can build a standalone
+   executable using:
+   #+BEGIN_SRC sh
+   ./gradlew nativeImage
+   #+END_SRC
+   You will find generated executable in =build/native-image/glade=.
+** Usage
+   GLADE is split into three subcommands --- =learn=, =fuzz= and =print=.
+*** Learn
+    [[./images/learn.svg]]
+
+    To learn an input grammar, you need two things --- oracle (command that
+    returns non-zero code on invalid input) and seed inputs (examples of valid
+    inputs). GLADE expects seed inputs in a folder called =inputs=. To learn an
+    input grammar, you need to run the following command:
+    #+BEGIN_SRC sh
+    glade learn <command>
+    #+END_SRC
+    If =<command>= contains ={}=, then inputs will be passed to oracle as
+    arguments (each ={}= in =<command>= will be substituted with input).
+    Each ={/}= in command will be substituted with path to file containing input.
+    Whenever ={}= or ={/}= is not in command, inputs are send to the oracle on /standard input/.
+
+    For instance, if you want to learn a grammar of =sed='s valid inputs,
+    then create a folder called =inputs= with some valid seed inputs.
+    #+BEGIN_SRC sh
+    echo -n 's/abcd/bc/p' > inputs/seed1
+    echo -n 's/a[bc]d/bc/p' > inputs/seed2
+    #+END_SRC
+    =sed= also needs some file to operate on. So create an empty file:
+    #+BEGIN_SRC sh
+    touch empty_file
+    #+END_SRC
+    Then learn the grammar using the following command:
+    #+BEGIN_SRC sh
+    glade learn 'sed {} empty_file'
+    #+END_SRC
+    Grammar will be saved in the current /working directory/.
+
+    GLADE can also use bytes as an input alphabet. You will need to pass
+    =--alphabet=BYTE= as a GLADE's argument.
+*** Fuzz
+    [[./images/fuzz.svg]]
+
+    You can use learned grammar for fuzzing:
+    #+BEGIN_SRC sh
+    glade fuzz -i <path_to_grammar> <command>
+    #+END_SRC
+    Additional arguments can be used to specify things like recursion probability.
+*** Print
+    [[./images/print.svg]]
+
+    Learned grammar is saved in a machine-readable format. In order to print
+    grammar in human-readable form, you can run the following command:
+    #+BEGIN_SRC sh
+    glade print <path_to_grammar>
+    #+END_SRC
+    Grammar is printed as a regular expression. Recursive properties of grammar
+    are omitted.
+** Notes
+   This is an unofficial fork of GLADE. The main purpose of this fork is to provide
+   a more user friendly user-interface for GLADE. Pull requests are welcome.
+
+   For questions about the original project, feel free to contact =obastani@cs.stanford.edu=.
