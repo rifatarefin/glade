@@ -34,28 +34,28 @@ public class GrammarSynthesis {
 	private static Node getNode(String example, DiscriminativeOracle oracle) {
 		return GrammarTransformer.getTransform(RegexSynthesis.getNode(example, oracle), oracle);
 	}
-	
+
 	public static Grammar getGrammarSingle(String example, DiscriminativeOracle oracle) {
 		long time = System.currentTimeMillis();
 		if(!oracle.query(example)) {
 			throw new RuntimeException("Invalid example: " + example);
 		}
-		Log.info("PROCESSING EXAMPLE:\n" + example);
+		Log.info("Processing example: " + example);
 		Node node = getNode(example, oracle);
-		Log.info("SINGLE REGEX TIME: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
+		Log.info("Single regex time: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
 		time = System.currentTimeMillis();
 		Grammar grammar = new Grammar(node, MergesSynthesis.getMergesSingle(node, node, oracle));
-		Log.info("SINGLE MERGE TIME: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
+		Log.info("Single merge time: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
 		return grammar;
 	}
-	
+
 	public static Grammar getGrammarMultipleFromRoots(List<Node> roots, DiscriminativeOracle oracle) {
 		long time = System.currentTimeMillis();
 		Grammar grammar = new Grammar(new MultiAlternationNode(new NodeData(null, new Context()), roots), MergesSynthesis.getMergesMultiple(roots, oracle));
-		Log.info("MULTIPLE MERGE TIME: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
+		Log.info("Multiple merge time: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
 		return grammar;
 	}
-	
+
 	public static Grammar getGrammarMultiple(List<String> examples, DiscriminativeOracle oracle) {
 		List<Node> roots = new ArrayList<Node>();
 		for(String example : examples) {
@@ -63,14 +63,14 @@ public class GrammarSynthesis {
 		}
 		return getGrammarMultipleFromRoots(roots, oracle);
 	}
-	
+
 	public static Grammar getRegularGrammarMultipleFromRoots(List<Node> roots, DiscriminativeOracle oracle) {
 		long time = System.currentTimeMillis();
 		Grammar grammar = new Grammar(new MultiAlternationNode(new NodeData(null, new Context()), roots), new NodeMerges());
-		Log.info("MULTIPLE MERGE TIME: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
+		Log.info("Multiple merge time: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
 		return grammar;
 	}
-	
+
 	public static Grammar getRegularGrammarMultiple(List<String> examples, DiscriminativeOracle oracle) {
 		List<Node> roots = new ArrayList<Node>();
 		for(String example : examples) {
@@ -78,7 +78,7 @@ public class GrammarSynthesis {
 		}
 		return getRegularGrammarMultipleFromRoots(roots, oracle);
 	}
-	
+
 	public static boolean getCheck(DiscriminativeOracle oracle, Context context, Iterable<String> examples) {
 		for(String example : examples) {
 			if(!oracle.query(context.pre + example + context.post) || (context.useExtra() && !oracle.query(context.extraPre + example + context.extraPost))) {
@@ -87,7 +87,7 @@ public class GrammarSynthesis {
 		}
 		return true;
 	}
-	
+
 	public static Maybe<List<Node>> getMultiAlternationRepetitionConstantChildren(Node node, boolean isParentRep) {
 		if(!isParentRep) {
 			return new Maybe<List<Node>>();

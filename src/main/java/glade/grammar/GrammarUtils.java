@@ -131,7 +131,7 @@ public class GrammarUtils {
                 } else {
                     sb.append("(");
                     for(char character : characterOption) {
-                        sb.append(CharacterUtils.queryCharToAnsiString(character));
+                        sb.append(CharacterUtils.queryCharToAnsiString(character)).append("+");
                     }
                     sb.replace(sb.length()-1, sb.length(), ")");
                 }

@@ -123,8 +123,9 @@ class Learn implements Callable<Integer> {
     @ParentCommand
     private Main parent;
 
-    @Parameters(description = {"Each {} in command will be substituted with query.",
-        "Whenever {} is not in command, the query is sent to standard input."})
+    @Parameters(description = {"Each {} in command will be substituted with query (input).",
+        "Each {/} in command will be substituted with path to file containing query.",
+        "Whenever {} or {/} is not in command, the query is sent to standard input."})
     private String command;
 
     @Option(names = {"-o", "--output"}, description = "output, grammar file")
@@ -154,8 +155,7 @@ class Learn implements Callable<Integer> {
                     Log.debug("Reading seed input from " + p);
                     String seed = new String(Files.readAllBytes(p), StandardCharsets.ISO_8859_1);
                     if (!oracle.query(seed)) {
-                        throw new IllegalArgumentException("Seed input has been rejected by oracle: "
-                            + CharacterUtils.queryToAnsiString(seed));
+                        throw new IllegalArgumentException("Seed input has been rejected by oracle: " + seed);
                     }
                     Log.info("Adding new seed input: " + CharacterUtils.queryToAnsiString(seed));
                     seedInputs.add(seed);
@@ -214,8 +214,7 @@ class Fuzz implements Callable<Integer> {
     private double recursionProbability;
 
     @Override
-    // TODO add support for combined fuzzer
-    public Integer call() {
+    public Integer call() { // TODO add support for combined fuzzer
         parent.initGlade();
         Log.debug("Starting subcommand fuzz");
         int[] allowedLength = Main.parseAllowedLength(this.allowedLength);
@@ -281,13 +280,22 @@ class Print implements Callable<Integer> {
 class Oracle implements DiscriminativeOracle {
     private String command;
     private int[] allowedLength;
+    private Path tempFile;
 
     Oracle(String command, int[] allowedLength) {
         this.command = command;
         this.allowedLength = allowedLength;
+        if (command.contains("{/}")) {
+            try {
+                this.tempFile = Files.createTempFile("glade", ".tmp").toAbsolutePath();
+                Log.debug("Temporary file for oracle created: " + tempFile.toString());
+            } catch (IOException e) {
+                throw new RuntimeException("Cannot create a temporary file for oracle.");
+            }
+        }
     }
 
-    public boolean query(String query) {
+    public boolean query(String query) { // TODO add timeout (use Future)
         Log.debug("Oracle input: " + CharacterUtils.queryToAnsiString(query));
         if (allowedLength.length == 1 && query.length() != allowedLength[0]) {
             Log.debug("Oracle @|red failed|@ because the query length is not equal to " + allowedLength[0] + ".");
@@ -306,6 +314,13 @@ class Oracle implements DiscriminativeOracle {
                     return false;
                 }
                 p = Runtime.getRuntime().exec(command.replace("{}", query));
+            } else if (command.contains("{/}")) {
+                FileOutputStream out = new FileOutputStream(tempFile.toFile(), false);
+                for (char c : query.toCharArray()) {
+                    out.write(c);
+                }
+                out.close();
+                p = Runtime.getRuntime().exec(command.replace("{/}", tempFile.toString()));
             } else {
                 p = Runtime.getRuntime().exec(command);
                 for (char c : query.toCharArray()) {
@@ -314,7 +329,9 @@ class Oracle implements DiscriminativeOracle {
                 p.getOutputStream().close();
             }
 
-            Log.debug("Oracle output: " + new BufferedReader(new InputStreamReader(p.getInputStream()))
+            Log.debug("Oracle STDOUT: " + new BufferedReader(new InputStreamReader(p.getInputStream()))
+                .lines().collect(Collectors.joining("\n")));
+            Log.debug("Oracle STDERR: " + new BufferedReader(new InputStreamReader(p.getErrorStream()))
                 .lines().collect(Collectors.joining("\n")));
 
             p.waitFor();

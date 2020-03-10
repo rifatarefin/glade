@@ -31,7 +31,7 @@ public class RegexSynthesis {
 	public static Node getNode(String example, DiscriminativeOracle oracle) {
 		return getNode(new NodeData(example, new Context()), oracle, new NodeType[]{NodeType.REPETITION, NodeType.ALTERNATION}, true);
 	}
-	
+
 	private static List<String> getAlternationChecks(String first, String second) {
 		List<String> checks = new ArrayList<String>();
 		checks.add(second + first + second + first);
@@ -44,14 +44,14 @@ public class RegexSynthesis {
 		checks.add("");
 		return checks;
 	}
-	
+
 	private static List<String> getRepetitionChecks(String start, String rep, String end) {
 		List<String> checks = new ArrayList<String>();
 		checks.add(start + rep + rep + end);
 		checks.add(start + end);
 		return checks;
 	}
-	
+
 	private static class AlternationPartialNode {
 		private final NodeData first;
 		private final NodeData second;
@@ -60,7 +60,7 @@ public class RegexSynthesis {
 			this.second = second;
 		}
 	}
-	
+
 	private static class RepetitionPartialNode {
 		private final NodeData start;
 		private final NodeData rep;
@@ -71,7 +71,7 @@ public class RegexSynthesis {
 			this.end = end;
 		}
 	}
-	
+
 	private static Maybe<AlternationPartialNode> getAlternationPartialNode(NodeData cur, DiscriminativeOracle oracle) {
 		for(int i=1; i<=cur.example.length()-1; i++) {
 			String first = cur.example.substring(0, i);
@@ -79,13 +79,13 @@ public class RegexSynthesis {
 			if(GrammarSynthesis.getCheck(oracle, cur.context, getAlternationChecks(first, second))) {
 				NodeData firstData = new NodeData(first, new Context(cur.context, "", second, "", ""));
 				NodeData secondData = new NodeData(second, new Context(cur.context, first, "", "", ""));
-				Log.info("FOUND ALT: " + first + " ## " + second);
+				Log.info("Alternation found: " + first + " ## " + second);
 				return new Maybe<AlternationPartialNode>(new AlternationPartialNode(firstData, secondData));
 			}
 		}
 		return new Maybe<AlternationPartialNode>();
 	}
-	
+
 	private static Maybe<RepetitionPartialNode> getRepetitionPartialNode(NodeData cur, DiscriminativeOracle oracle, boolean isWholeStringRepeatable) {
 		for(int init=0; init<=cur.example.length()-1; init++) {
 			for(int len=cur.example.length()-init; len>=1; len--) {
@@ -99,18 +99,18 @@ public class RegexSynthesis {
 					NodeData startData = new NodeData(start, new Context(cur.context, "", rep+end, "", end));
 					NodeData repData = new NodeData(rep, new Context(cur.context, start, end, start, end));
 					NodeData endData = new NodeData(end, new Context(cur.context, start+rep, "", start, ""));
-					Log.info("FOUND REP: " + rep + " ## " + start + " ## " + end);
+					Log.info("Repetition found: " + start + " ## " + rep + " ## " + end);
 					return new Maybe<RepetitionPartialNode>(new RepetitionPartialNode(startData, repData, endData));
 				}
 			}
 		}
 		return new Maybe<RepetitionPartialNode>();
 	}
-	
+
 	private static Maybe<Node> getConstantNode(NodeData cur, DiscriminativeOracle oracle) {
 		return new Maybe<Node>(new ConstantNode(cur));
 	}
-	
+
 	private static Maybe<Node> getAlternationNode(NodeData cur, DiscriminativeOracle oracle) {
 		Maybe<AlternationPartialNode> maybe = getAlternationPartialNode(cur, oracle);
 		if(!maybe.hasT()) {
@@ -120,7 +120,7 @@ public class RegexSynthesis {
 		Node second = getNode(maybe.getT().second, oracle, new NodeType[]{NodeType.ALTERNATION, NodeType.REPETITION}, true);
 		return new Maybe<Node>(new AlternationNode(cur, first, second));
 	}
-	
+
 	private static Maybe<Node> getRepetitionNode(NodeData cur, DiscriminativeOracle oracle, boolean isWholeStringRepeatable) {
 		Maybe<RepetitionPartialNode> maybe = getRepetitionPartialNode(cur, oracle, isWholeStringRepeatable);
 		if(!maybe.hasT()) {
@@ -131,11 +131,11 @@ public class RegexSynthesis {
 		Node end = getNode(maybe.getT().end, oracle, new NodeType[]{NodeType.REPETITION}, true);
 		return new Maybe<Node>(new RepetitionNode(cur, start, rep, end));
 	}
-	
+
 	private static enum NodeType {
 		REPETITION, ALTERNATION;
 	}
-	
+
 	private static Node getNode(NodeData cur, DiscriminativeOracle oracle, NodeType[] types, boolean isWholeStringRepeatable) {
 		for(NodeType type : types) {
 			switch(type) {
