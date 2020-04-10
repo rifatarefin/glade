@@ -23,6 +23,7 @@ import glade.grammar.GrammarUtils.Node;
 import glade.grammar.GrammarUtils.NodeData;
 import glade.grammar.GrammarUtils.NodeMerges;
 import glade.grammar.GrammarUtils.RepetitionNode;
+import glade.util.CharacterUtils;
 import glade.util.Log;
 import glade.util.OracleUtils.DiscriminativeOracle;
 import glade.util.Utils.Maybe;
@@ -40,7 +41,7 @@ public class GrammarSynthesis {
 		if(!oracle.query(example)) {
 			throw new RuntimeException("Invalid example: " + example);
 		}
-		Log.info("Processing example: " + example);
+		Log.info("Processing example: " + CharacterUtils.queryToAnsiString(example));
 		Node node = getNode(example, oracle);
 		Log.info("Single regex time: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
 		time = System.currentTimeMillis();

@@ -22,6 +22,7 @@ import glade.grammar.GrammarUtils.MultiConstantNode;
 import glade.grammar.GrammarUtils.Node;
 import glade.grammar.GrammarUtils.NodeMerges;
 import glade.grammar.GrammarUtils.RepetitionNode;
+import glade.util.CharacterUtils;
 import glade.util.Log;
 import glade.util.OracleUtils.DiscriminativeOracle;
 import glade.util.Utils.MultivalueMap;
@@ -95,8 +96,10 @@ public class MergesSynthesis {
 		}
 		if((isStructuredExample(firstRep) && isStructuredExample(secondRep))
 				|| (GrammarSynthesis.getCheck(oracle, firstRep.getData().context, firstExamples) && GrammarSynthesis.getCheck(oracle, secondRep.getData().context, secondExamples))) {
-			Log.info("First merge node: " + firstRep.getData().context.pre + " ## " + firstRep.getData().example + " ## " + firstRep.getData().context.post);
-			Log.info("Second merge node: " + secondRep.getData().context.pre + " ## " + secondRep.getData().example + " ## " + secondRep.getData().context.post);
+			Log.info("First merge node: " + CharacterUtils.queryToAnsiString(firstRep.getData().context.pre) + " @|fg(red) ||@ " + CharacterUtils.queryToAnsiString(firstRep.getData().example)
+                     + " @|fg(red) ||@ " + CharacterUtils.queryToAnsiString(firstRep.getData().context.post));
+			Log.info("Second merge node: " + CharacterUtils.queryToAnsiString(secondRep.getData().context.pre) + " @|fg(red) ||@ " + CharacterUtils.queryToAnsiString(secondRep.getData().example)
+                     + " @|fg(red) ||@ " + CharacterUtils.queryToAnsiString(secondRep.getData().context.post));
 			merges.add(firstRep, secondRep);
 		}
 	}

@@ -78,7 +78,7 @@ public class GrammarTransformer {
 		String example = node.getData().example;
 		Context context = node.getData().context;
 		if(example.length() != 0) {
-			Log.info("Generalizing constant: " + context.pre + " ## " + example + " ## " + context.post);
+			Log.info("Generalizing constant: " + CharacterUtils.queryToAnsiString(context.pre) + " @|fg(red) ||@ " + CharacterUtils.queryToAnsiString(example) + " @|fg(red) ||@ " + CharacterUtils.queryToAnsiString(context.post));
 		}
 		List<List<Character>> characterOptions = new ArrayList<List<Character>>();
 		List<List<Character>> characterChecks = new ArrayList<List<Character>>();
@@ -140,7 +140,7 @@ public class GrammarTransformer {
 
 	private static MultiAlternationNode generalizeMultiAlternationConstant(MultiAlternationNode node, MultivalueMap<MultiAlternationNode,ConstantNode> multiAlternationNodeConstantChildren, DiscriminativeOracle oracle) {
 		List<MultiConstantNode> curConsts = new ArrayList<MultiConstantNode>();
-		Log.info("Generalizing multi alternation node: " + node.getData().example);
+		Log.info("Generalizing multi alternation node: " + CharacterUtils.queryToAnsiString(node.getData().example));
 		for(Node child : multiAlternationNodeConstantChildren.get(node)) {
 			if(!isContained(child.getData().example, curConsts)) {
 				curConsts.add(generalizeConstant((ConstantNode)child, oracle));

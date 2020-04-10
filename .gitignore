@@ -27,6 +27,11 @@ gradle-app.setting
 *~
 \#*\#
 
+#################### LSP
+.classpath
+.project
+.settings/
+
 #################### Vim
 # Swap
 [._]*.s[a-v][a-z]

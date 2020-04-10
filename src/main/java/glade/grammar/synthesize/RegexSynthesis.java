@@ -20,6 +20,7 @@ import glade.grammar.GrammarUtils.Context;
 import glade.grammar.GrammarUtils.Node;
 import glade.grammar.GrammarUtils.NodeData;
 import glade.grammar.GrammarUtils.RepetitionNode;
+import glade.util.CharacterUtils;
 import glade.util.Log;
 import glade.util.OracleUtils.DiscriminativeOracle;
 import glade.util.Utils.Maybe;
@@ -79,7 +80,7 @@ public class RegexSynthesis {
 			if(GrammarSynthesis.getCheck(oracle, cur.context, getAlternationChecks(first, second))) {
 				NodeData firstData = new NodeData(first, new Context(cur.context, "", second, "", ""));
 				NodeData secondData = new NodeData(second, new Context(cur.context, first, "", "", ""));
-				Log.info("Alternation found: " + first + " ## " + second);
+				Log.info("Alternation found: " + CharacterUtils.queryToAnsiString(first) + " @|fg(red) ||@ " + CharacterUtils.queryToAnsiString(second));
 				return new Maybe<AlternationPartialNode>(new AlternationPartialNode(firstData, secondData));
 			}
 		}
@@ -99,7 +100,8 @@ public class RegexSynthesis {
 					NodeData startData = new NodeData(start, new Context(cur.context, "", rep+end, "", end));
 					NodeData repData = new NodeData(rep, new Context(cur.context, start, end, start, end));
 					NodeData endData = new NodeData(end, new Context(cur.context, start+rep, "", start, ""));
-					Log.info("Repetition found: " + start + " ## " + rep + " ## " + end);
+					Log.info("Repetition found: " + CharacterUtils.queryToAnsiString(start) + " @|fg(red) ||@ " + CharacterUtils.queryToAnsiString(rep)
+                             + " @|fg(red) ||@ " + CharacterUtils.queryToAnsiString(end));
 					return new Maybe<RepetitionPartialNode>(new RepetitionPartialNode(startData, repData, endData));
 				}
 			}
