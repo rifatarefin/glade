@@ -83,7 +83,7 @@ public class CharacterUtils {
                 }
                 return "@|yellow " + ch + "|@";
             case BYTE:
-                return String.format("@|yellow %02x|@", (int) ch);
+                return String.format("@|yellow \\x%02x|@", (int) ch);
             default:
                 throw new IllegalStateException("This method doesn't support used input alphabet.");
         }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GrammarUtils {
 	public static class Grammar {
@@ -122,21 +123,50 @@ public class GrammarUtils {
 			return sb.toString();
 		}
         public String toAnsiString() {
-            StringBuilder sb = new StringBuilder();
-            for(Set<Character> characterOption : this.characterOptions) {
-                if (characterOption.size() == 1) {
-                    sb.append(CharacterUtils.queryCharToAnsiString(characterOption.iterator().next()));
-                } else if (characterOption.size() == CharacterUtils.getNumberOfCharacters()) {
-                    sb.append("_");
-                } else {
-                    sb.append("(");
-                    for(char character : characterOption) {
-                        sb.append(CharacterUtils.queryCharToAnsiString(character)).append("+");
-                    }
-                    sb.replace(sb.length()-1, sb.length(), ")");
-                }
+            if (this.characterOptions.size() == 0) {
+                return "";
             }
+            StringBuilder sb = new StringBuilder();
+            Set<Character> prevCharOption = this.characterOptions.get(0);
+            int count = 0;
+            for(Set<Character> charOption : this.characterOptions) {
+                if (charOption.equals(prevCharOption)) {
+                    count++;
+                } else {
+                    addCharOptionToBuilder(prevCharOption, count, sb);
+                    count = 1;
+                }
+                prevCharOption = charOption;
+            }
+            addCharOptionToBuilder(prevCharOption, count, sb);
             return sb.toString();
+        }
+        private void addCharOptionToBuilder(Set<Character> charOption, int count, StringBuilder sb) {
+            if (count < 1) {
+                return;
+            }
+            if (charOption.size() == CharacterUtils.getNumberOfCharacters()) {
+                sb.append(".");
+            } else if (charOption.size() == 1) {
+                 sb.append(CharacterUtils.queryCharToAnsiString(charOption.iterator().next()));
+            } else {
+                sb.append("[");
+                List<Character> characterClass = charOption.stream().sorted().collect(Collectors.toList());
+                char first = characterClass.get(0);
+                char last = characterClass.get(characterClass.size() - 1);
+                if (characterClass.size() > 2 && first + characterClass.size() - 1 == last) {
+                    sb.append(CharacterUtils.queryCharToAnsiString(first)).append("-")
+                        .append(CharacterUtils.queryCharToAnsiString(last));
+                } else {
+                    for(char character : characterClass) {
+                        sb.append(CharacterUtils.queryCharToAnsiString(character));
+                    }
+                }
+                sb.append("]");
+            }
+            if (count > 1) {
+                sb.append("{" + count + "}");
+            }
         }
 	}
 
@@ -190,10 +220,11 @@ public class GrammarUtils {
 		}
         public String toAnsiString() {
             StringBuilder sb = new StringBuilder();
+            sb.append("(");
             for(Node child : this.children) {
-                sb.append("@|blue (|@").append(child.toAnsiString()).append("@|blue )|@@|blue +|@");
+                sb.append("@|blue (|@").append(child.toAnsiString()).append("@|blue )|@|");
             }
-            return sb.substring(0, sb.length()-10);
+            return sb.replace(sb.length() - 1, sb.length(), ")").toString();
         }
 	}
 
