@@ -8,7 +8,7 @@
 
   For a detailed introduction to GLADE, see:
   - [[http://arxiv.org/abs/1608.01723][ *Synthesizing Program Input Grammars* ]]
-** Instalation
+** Installation
    First of all, clone this repository:
    #+BEGIN_SRC sh
    git clone 'https://github.com/kuhy/glade'
@@ -55,6 +55,12 @@
     glade learn 'sed {} empty_file'
     #+END_SRC
     Grammar will be saved in the current /working directory/.
+
+**** Edit
+    Learning grammar from XMLs supported only. The =command= field should be empty.
+    #+BEGIN_SRC sh
+    glade learn ''
+    #+END_SRC
 
     GLADE can also use bytes as an input alphabet. You will need to pass
     =--alphabet=BYTE= as a GLADE's argument.
