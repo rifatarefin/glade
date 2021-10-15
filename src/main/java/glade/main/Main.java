@@ -36,6 +36,10 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.InputSource;
+
 import glade.util.Utils;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -307,39 +311,43 @@ class Oracle implements DiscriminativeOracle {
             return false;
         }
         try {
-            Process p;
-            if (command.contains("{}")) {
-                if (query.contains("\0")) { // Command arguments can't contain null bytes.
-                    Log.debug("Oracle @|red failed|@ because the query contains a null byte.");
-                    return false;
-                }
-                p = Runtime.getRuntime().exec(command.replace("{}", query));
-            } else if (command.contains("{/}")) {
-                FileOutputStream out = new FileOutputStream(tempFile.toFile(), false);
-                for (char c : query.toCharArray()) {
-                    out.write(c);
-                }
-                out.close();
-                p = Runtime.getRuntime().exec(command.replace("{/}", tempFile.toString()));
-            } else {
-                p = Runtime.getRuntime().exec(command);
-                for (char c : query.toCharArray()) {
-                    p.getOutputStream().write(c);
-                }
-                p.getOutputStream().close();
-            }
 
-            Log.debug("Oracle STDOUT: " + new BufferedReader(new InputStreamReader(p.getInputStream()))
-                .lines().collect(Collectors.joining("\n")));
-            Log.debug("Oracle STDERR: " + new BufferedReader(new InputStreamReader(p.getErrorStream()))
-                .lines().collect(Collectors.joining("\n")));
+            SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(query)));
+            return true;
+            // Process p;
+            // if (command.contains("{}")) {
+            //     if (query.contains("\0")) { // Command arguments can't contain null bytes.
+            //         Log.debug("Oracle @|red failed|@ because the query contains a null byte.");
+            //         return false;
+            //     }
+            //     p = Runtime.getRuntime().exec(command.replace("{}", query));
+            // } else if (command.contains("{/}")) {
+            //     FileOutputStream out = new FileOutputStream(tempFile.toFile(), false);
+            //     for (char c : query.toCharArray()) {
+            //         out.write(c);
+            //     }
+            //     out.close();
+            //     p = Runtime.getRuntime().exec(command.replace("{/}", tempFile.toString()));
+            // } else {
+            //     p = Runtime.getRuntime().exec(command);
+            //     for (char c : query.toCharArray()) {
+            //         p.getOutputStream().write(c);
+            //     }
+            //     p.getOutputStream().close();
+            // }
 
-            p.waitFor();
+            // Log.debug("Oracle STDOUT: " + new BufferedReader(new InputStreamReader(p.getInputStream()))
+            //     .lines().collect(Collectors.joining("\n")));
+            // Log.debug("Oracle STDERR: " + new BufferedReader(new InputStreamReader(p.getErrorStream()))
+            //     .lines().collect(Collectors.joining("\n")));
 
-            Log.debug("Oracle exit value: " + (p.exitValue() == 0 ? "@|green " : "@|red ") + p.exitValue() + "|@");
-            return p.exitValue() == 0;
+            // p.waitFor();
+
+            // Log.debug("Oracle exit value: " + (p.exitValue() == 0 ? "@|green " : "@|red ") + p.exitValue() + "|@");
+            // return p.exitValue() == 0;
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            // throw new IllegalStateException(e);
+            return false;
         }
     }
 }
