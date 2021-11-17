@@ -14,13 +14,19 @@
 
 package glade.util;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+
 public class OracleUtils {
 	public interface Oracle {
 		public String execute(String query);
 	}
 	
-	public interface DiscriminativeOracle {
-		public abstract boolean query(String query);
+	public interface DiscriminativeOracle{
+		// public FileWriter fileWriter = new FileWriter("current_input.txt",false)
+		// public void tempFile() throws Exception;
+		public abstract boolean query(String query) throws IOException;
 	}
 	
 	public static interface Wrapper {
@@ -59,7 +65,7 @@ public class OracleUtils {
         }
 
         @Override
-        public boolean query(String query) {
+        public boolean query(String query) throws IOException {
                 return this.oracle.query(this.wrapper.wrap(query));
         }
     }

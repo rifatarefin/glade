@@ -1,0 +1,334 @@
+2021-10-27 10:16:05,311 - INFO - Loading grammar from 2021-10-26_21:40.gram
+Input: <?ml version="1.0" encoding="-"?>
+<System>
+<P Ne="i">[</P>
+<P me="e">0</P> <P ae="O">o</P> <P ae="o">o</P>
+<P Ne="i">u</P>
+<P Ne="e">d</P>
+<P ae="r">6</P> <P ae="o">i</P> <Block BlockTyp
+="u=]"
+U="">camU="m" SID="1"> <P ae="s"> </P> <P Ne="o">]</P> <P ae="Z">1</P> <P Ne="o">u</P> <P Ae="m">1</P> </Block> <Block BlockTy="(]6"d="lv"
+u="4h"yame="b" SID="2"> <P Ne="s"> </P>
+<P me="Z">2</P> </Block> <Block BlockTaq:Jme="l" SID="3"> <P ae="s">3</P> <P Ne="r">3</P>
+<P me="V">1</P>
+<P me="a">1</P></Block> <Block BNockType="s" Name="b" SID="4">
+<P ae="o"> </P>
+<P Ne="O">4</P> <P ae="V">6</P> <P Ne="e">1</P>
+</Block> <Block BlockTpXtpQ="S" Name="c" SID="5"> <P ae="i"></P> <Pme="Z">5</P>r<P Ne="T">0</P> <P ae="_">]</P> <P Ne="t">3</P>
+<P ae="l">0</P>
+</Block> <Block BlockTyame="f" SID="6"> <P ae="i">0</P> <P me="Z">6</P> <P me="u">3</P>
+<P me="e">1</P> </Block>
+<Line> <P ae="O">1</P>
+<P me="c">o</P> <P me="P">[</P> <P Ne="t">:</P>
+</Line> <Line>.W <PrdeF="dC">u_a</P> <P Ne="c">o</P> <P ae="o">|</P> <P Ne="D">:</P> </Line>
+</System>
+
+pass
+
+Input: <?ml version="1.0" encoding="t"?>
+<System> <P Ne="o">1</P> <P ae="R">0</P>
+<P ae="O">n</P> <P Ne="o">f</P> <P Ne="m">c</P> <P Ne="R">e</P>
+<P Ne="I">6</P>V(<P>gqa="dwi"></P>
+<Block BtockType="i" Name=">"SID="1">
+<P aH="L^i"></P> <P ae="o">0</P>f<P
+lLCL="hE4">wjJ</P>W<P
+f="05s">0~%</P>z<P>v="">"</P> <P ae="P">u</P> <P me="m">1</P> </Block>
+<Block BlockType="u" Name="M" SID="2"> <P ae="i">5</P> <P ae="e">2</P> </Block>
+<Block BZJN=""	B="" O="H[s">QsoA=""dZpockType="y" Name="f" SID="3"> <P ae="t">1</P> <P me="o">,</P>
+<P me="r">3</P> <P ae="n">1</P> </Block>
+<Block BluyMM="y"	r="d"d="_"
+:ckTyre="S" Name="b" SID="5"> <P me="i">6</P> <P ke="?">5</P> <P ae="m">H</P> <P Ne="B">7</P> <P me="r">2</P>
+<P Ne="S">0</P> </Block> <Block BlockType="r" Name="4" SID="4"><P	V="3"></P> <P me="e">4</P> </Block>
+<Line> <P Ne="e">1</P> <P Ne="S">u</P> <P Ne="i">5</P>@0a<P>c="0CT">
+UZ</P>-.<P
+WJ=""></P>BV<P	Wq_W="">W</P> </Line> <Line> <P ae="d">4</P>
+<P me="r">u</P>
+<P aH=""></P> <Branch> <P ae="e">2</P> <P Ne="D">4</P> </Branch> <Branch> <P me="Z"></P> <P me="P">]</P> <P Ng="7/G">Mr</P>
+</Branch> </Line> <Line> <P ae="r">3</P> <P Ne="c">d</P> <P ae="i">,</P> <P Ne="s">1</P> </Line>
+</System>
+
+pass
+
+Input: <?ml version="1.0" encoding="8"?>
+<System>
+<P ae="t">4</P> <P Ne="e">0</P>
+<P Ne="n">n</P> <P ae="t">o</P>
+<P me="#">D</P> <P ae="F">2</P> <P ae="p"></P> <P me="W">5</P> <P ae="o">n</P> <Block BlockType="b" NamO="1" SID="1">
+<P Nf="">O\x7f</P>
+<P ae="r">1</P> <P ae="e">o</P> </Block>
+<Block BlockType="n" Name="c" SID="2">
+<P ae="s">,</P> <P Ne="r">2</P>
+</Block> <Block BlockType="c" Name="k"ID="3"> <P Ne="o">[</P>1<P Ne="t">}</P> <P Ne="5">3</P> <P ae="S">i</P> <P se="u">D</P> <P me="t">f</P> </Block>
+<Block BlockType="o" Name="l" SID="4">
+<P Ne="s">h</P> <P Ne="P">0</P> <P ae="O">4</P> <P ae="e">u</P> <P ae="r">\</P> <P le="a">o</P>
+</Block>
+<Block BlockType="R" Name="b" SID="5"> <P ae="P">3</P> <P Ne="e">5</P> <P me="M">[</P> <P me="e">9</P> <P ae="e">9</P>
+<P Ne="a">0</P>
+</Block>
+<Line> <P me="Z">5</P> <P Ne="S">#</P> <P me="n">[</P> <Branch> <P me="r">u</P>
+<P me="i">0</P> <P me="s">#</P> </Branch> <Branch>
+<P ae="r">6</P> <P Ne="D">#</P> </Branch> </Line> <Line> <P ae="O">6</P> <P ae="c">1</P> <P me="s"> </P> <Branch> <P Ne="Z">2</P>k<P ae="i">;</P> <P Ne="D">i</P> </Branch> <Branch> <P ae="d">4</P> <P Ne="D">#</P>Z
+d</Branch> </Line>
+</System>
+
+pass
+
+Input: <?ml version="1.0" encoding="t"?>
+<System> <P ae="c">1</P>
+<P me="y">,</P> <P ae="e">o</P> <P me="c">o</P>
+<P ae="x">e</P>
+<P ae="e">p</P> <P ae="t">5</P> <P Ne="S">n</P> <Block BlockType="c" Name="1" SID="1"> <P me="s">1</P> <P Ne="i">9</P> <P Ne="d">1</P> <P me="t">u</P>
+<P Ne="p">1</P> </Block> <Block BlockType="t" Name="k" SID="2"> <P Ne="r">2</P>
+<P Ne="P">3</P> <P Ne="Z">2</P>
+<P ae="t">*</P>
+</Block> <Block BlockType="T" Name="f" SID="3"> <P cA="?P\x7f">6'q</P> <P ae="d">3</P>
+</Block> <Block BlockTBpe="a" Name="f" SID="4"> <P ae="i">,</P> <P Ne="r">4</P> <P me="V">1</P>
+<P
+gWn="">=a</P> </Block> <Block BlockType="n" Name="c" SID="5"> <P ae="n">,</P> <P me="r">5</P> </Block><Line>[<P>iAEG="8,}">}-[</P>Srn<P	YEY="rW">\x7f-S</P>z0R</Line>
+<Line> <P
+chT="">(</P> <P me="S">4</P>
+<P ae="t">6</P> <P ae="D">i</P> </Line>
+<Line> <P Ne="d">4</P> <P ae="r">\k,</P>xF|<P>Kv="V">+$D</P><P>wHT="2u">6</P>(%K<P x="pt\x7f"></P> <Branch> <P Ne="d">3</P>_<P
+Di="P">cRb</P>;hK<P	EYTh="P!">uI</P> <P Ne="D">n</P> </Branch>
+<Branch>
+<P Ne="r">5</P> <P me="s">0</P> <P ae="t">#</P> </Branch> </Line>
+</System>
+
+pass
+
+Input: <?ml version="1.0" encoding="t"?>
+<System> <P ae="c">1</P>
+<P me="y">,</P> <P ae="e">o</P> <P me="c">o</P>
+<P ae="x">e</P>8<P>cwB="
+ZK">^G</P> <P ae="t">5</P> <P Ne="S">n</P> <Block BlockType="c" Name="1" SID="1"> <P me="s">1</P> <P Ne="i">9</P> <P Ne="d">1</P> <P me="t">u</P>
+<P Ne="p">1</P> </Block>>z-<Block
+egIp=""
+bsB="2"><P	Dk="">ma8</P>0.F<P>mh="">wsk</P><P	Z="'7">I+?</P>u[<PHY="a"></P>@^<BlockXjFq_Fm=""><PEa_H="ZF">s</P><P ae="e">o</P> <P ae="e">o</P> <P ae="e">o</P> <P ae="e">o</P> </Block>
+</Block> <Block BlockType="T" Name="f" SID="3"> <P mD="t">1</P> <P ae="d">3</P>
+</Block> <Block BlockTypS="a" Name="f" SID="4"> <P ae="i">,</P> <P Ne="r">4</P>k<P>iZJ="bd">@jz</P>
+<P me="S">1</P> </Block> <Block BlockType="n" Name="c" SID="5"> <P ae="n">,</P> <P me="r">5</P> </Block>
+<Line> <P Ne="Z">1</P> <P Ne="c">t</P> <P me="n">3</P>
+<P ae="t">i</P> </Line>
+<Line> <P me="e">2</P>ctD<P>Otky="%51">IK|</P>{\x7fH<Pc_zg="ge)">Nd@</P>CS<P	V HV="\x7fa%">PF</P><P JcIl="US:">2c`</P>Fq<P vZCc="HG"></P>
+<P ae="t">6</P> <P ae="D">i</P> </Line>
+<Line> <P Ne="d">4</P> <P ae="r">u</P> <P Ne="n">0</P> <Branch> <P Ne="d">3</P> <P al="%>"></P> <P Ne="D">n</P> </Branch>
+<Branch>
+<P Ne="r">5</P> <P me="s">0</P> <P ae="t">#</P> </Branch> </Line>
+</System>
+
+fail
+
+Input: <?ml version="1.0" encoding="t"?>
+<System> <P Ne="o">1</P> <P ae="R">0</P>
+<P>ae="O">n</P> <P Nh="~l">9w</P> <P Ne="m">c</P> <P Ne="R">e</P>
+<P Ne="I">6</P>*<P
+KbU="b$">_W4</P>
+<Block BlockType="i" Nome="1" SID="1">
+<P aJ="o"> </P> <P a:="o">0</P> <P me="r">1</P> <P ae="P">u</P> <P Te="m">1</P> </Block>
+<Block BlockType="u" Name="k" SID="2"> <P ae="i">5</P> <P aO="e">2</P> </Block>
+<BlockBlockTyze="y" Npme="f" SID="3"> <P ae="t">1</P> <P me="o">,</P>
+<P me="r">3</P> <P ae="n">1</P> </Block>
+<Block BlockTyCSme="b" SID="5"> <P me="i">6</P> <P ae="O">5</P> <P ae="m">.</P> <P Ne="B">7</P> <P me="r">2</P>
+<P Ne="S">0</P> </Block> <Block BlockType="r" Name="4" SID="4">9"K<P JFIX="*">;?O</P>P8</Block>
+<Line>)E}<P	Xuok="">]</P> <P Ne="S"></P> <P Ne="i">5</P> <P me="s">n</P> </Line> <Line>
+<P me="r">u</P>
+<P ae="t"> </P> <Branch> <P ae="e">2</P> <P Ne="D">%=</P> </Branch> <Branch> <P be="Z">5</P> <P me="P">]</P> <P Ne="s">#</P>
+</Branch> </Line> <Line> <P ae="r">3</P> <P Ne="c">1</P> <P ae="i">,</P> <P Ne="s">1</P> </Line>
+</System>
+
+pass
+
+Input: <?ml version="1.0" encoding="t"?>
+<System> <P ae="c">1</P>
+<P me="y">,</P> <P ae="e">o</P> <P me="c">o</P>
+<P ae="x">e</P>
+<P ae="e">p</P> <P ae="t">5</P> <P Ne="S">n</P> <Block BlockType="c" Name="1" SID="1"> <P me="s">1</P> <P Ne="i">9</P> <P Ne="d">1</P> <P me="t">u</P>
+<P Ne="p">1</P> </Block> <Block BlockType="t" Name="k" SID="2"> <P Ne="r">2</P>
+<P Ne="P">3</P> <P Ne="Z">2</P>
+<P ae="t">*</P>
+</Block> <Block BlockType="T" Name="f" SID="3"> <P me="t">1</P> <P ae="d">3</P>
+</Block> <Block BlockType="a" Name="f" SID="4"> <P ae="i">,</P> <P Ne="r">4</P>	Yn<P YJsZ="'b">S</P>
+<P me="S">1</P> </Block> <Block BlockType="n" Nme="c" SID="5"> <P ae="n">,</P> <P me="r">5</P> </Block>
+<Line> <P Ne="Z">1</P> <P Ne="c">t</P> <P me="n">3</P>
+<P ae="t">i</P> </Line>
+<Line> <P me="e">2</P> <P me="S">4</P>
+<P ae="t">6</P> <P ae="D">i</P> </Line>
+<Line> <P Ne="d">4</P> <P ae="r">u</P> <P Ne="n">0</P> <Branch> <P Ne="d">3</P> <P ae="i">-</P> <P Ne="D">n</P> </Branch>
+<Branch>
+<P Ne="r">5</P> <P me="s">0</P> <P ae="t">#</P> </Branch> </Line>
+</System>
+
+pass
+
+Input: <?ml version="1.0" encoding="-"?>
+<System>
+<P	Ne="i">[</P>
+<P me="e">0</P> <P ae="O">o</P> <P ae="o">o</P>
+<P Ne="i">u</P>
+<P Ne="e">d</P>
+<P ae="r">6</P> <P ae="o">i</P> <Block BlockType="s" NamID="1"> <P ae="s"> </P> <P Ne="o">]</P> <P ae="Z">1</P> <P Ne="o">u</P> <P Ne="m">1</P> </Block> <Block BlockType="D" Name="b" SID="2"> <P Ne="s"> </P>
+<P me="Z">2</P> </Block> <Block BlockType="t" Name="l" SID="3"> <P ae="s">3</P> <P Ne="r">3</P>
+<P me="V">1</P>
+<P me="a">1</P> </Block> <Block BKockType="s" Name="b" SID="4">+qD<P
+WQME="d">NCe</P>
+<P Ne="O">4</P> <P ae="V">6</P> <P Ne="e">1</P>
+</Block> <Block BlockTyBIP="38Z">l="FS1" A="lB"	_amomoID="5"> <P ae="i"> </P> <P me="Z">5</P> <P Me="T">0</P> <P ae="r">]</P> <P Ne="t">3</P>
+<P ae="l">0</P>
+</Block> <Block BlockType="s" Name="f" SID="6"> <P ae="i">0</P> <P me="Z">6</P> <P me="u">3</P>
+<P me="e">1</P> </Block>
+<Line> <P De="O">1</P>
+<P me="c">o</P> <P me="P">[</P> <P	bp=")}W">]L[</P>
+</Line>)<Line> <P Ne="r">2</P> <P Ne="c">o</P> <P ae="o">6</P> <P 
+e="D">:</P> </Line>
+</System>
+
+pass
+
+Input: <?xl version="1.0" encoding="u"?>
+<System> <P Ne="o">5</P> <P NB="t">0</P>
+<P ae="n">o</P> <P Ne="e">f</P> <P Ne="c">d</P>
+<P Ne="N">s!</P> <P ae="k">6</P>
+<P Ne="o">S</P> <Block BlockType="B" Name="f" SID="1"> <P Ne="o"> </P> <P me="d">1</P> <P Ne="a">4</P> <P Ne="r">o</P> </Block>
+<Block BlockType="p" Name="l" SID="2"> <P Ne="o">]</P> <P ae="P"> </P> <P me="d">2</P> <P ae="c">m</P>
+<P me="t">1</P> <P Ne="i">o</P> </Block> <Block BlockType="p" Name="c" SID="4"> <P Ne="o">[</P> <P me="o">0</P> <P Ne="Z">4</P> <P ae="i">p</P> <P Ne="u">1</P> <P Ne="F">o</P>
+</Block> <Block BlockType="t" Name="l" SID="5"> <P Ne="o">6</P> <P ae="Z">5</P>
+<P Ne="\">6</P> <P Ne="S">1</P>
+</Block> <Block BlockType="r" Name="f" SID="3">
+<P Ne="P"> </P>
+<P Ne="r">3</P>
+</Block> <Line>
+<P Ne="O">1</P> <P ae="S">#</P> <P me="s">9</P> <P ae="s">3</P>
+</Line> <Line> <P Ne="Z">2</P> <P Ne="c">1</P> <P Ne="s">[</P>
+<P Ne="t">1</P> </Line>
+</System>
+
+pass
+
+Input: <?ml version="1.0" encoding="-"?>
+<System>
+<P Ne="i">[</P>
+<P me="e">0</P> <P ae="O">o</P> <P ae="o">o</P>
+<P Ne="i">u</P>
+<P Nw="_Yu">9n</P>
+<P ae="r">6</P> <P u=",3w">32F</P> <Block BlrUdckType="" Name="f"zID="1"> <P ae="s"> </P> <P Ne="o">]</P> <P ae="Z">1</P> <P Ne="o">u</P> <P Ne="m">1</P> </Block> <Block BlockType="D" Name="b" SID="2">R<P Ne="s">Q</P>
+<P me="Z">2</P> </Block> <Block BlockType="t" Name="l" SID="t">i<P ae="s">3</P> <P Ne="r">3</P>q<P me="V">1</P>
+<P me="a">1</P> </Block> <Block BlckType="s" Name="b" SID="4">o<P ae="o"> </P>
+<P Ne="O">4</P> <P ae="V">6</P> <P Ne="e">1</P>
+</Block> <Block BlocKiYType="S" Name="c" SID="5"> <P ae="i"> </P> <P me="Z">Z</P> <P Ne="T">0</P> <P ae="r">]</P> <P Ne="t">3</P>
+<P ae="l">0</P>
+</Block> <Block Blockype="s" NFFume="f" SID="6"> <P ae="i">0</P> <P me="m">6</P> <P me="u">3</P>
+<P me="e">1</P> </Block>
+<Line>`mj<P dVv="">PA=</P>e[X<P>Iecy="+?">Y</P>Gr<P
+P>U="a">W</P>=Eu<P
+kl="\x7f=8">*+</P>\N<P
+Sb="`	">]7v</P>)8+</Line> <Line>M<P Ne="c">o</P> <P ae="o">6</P> <P ljo="">VR"</P> </Line>
+</System>
+
+fail
+
+Input: <?ml version="1.0" encoding="?"?>
+<System>
+<P ae="t">4</P> <P Ne="e">0</P>
+<P Ne="n">n</P> <P ae="t">o</P>
+<P Ze="i">D</P> <P ae="F">2</P> <P ae="p">u</P> <P me="W">5</P> <P ae="o">n</P> <Block BlockLQdype="J" Name="1" SIj="1">
+<P Ne="t">,</P>
+<P ae="r">1</P> <P ae="e">o</P> </Block>
+<Block BlockType="n" Nhkfme="c" SID="2">
+<P ae="s">,</P> <P Ne="r">2</P>
+</Block> <Block BlocknZRype="c" Name="k" SD="3">{<P Ne="t">3</P> <P Ne="r">3</P> <P ae="S">i</P> <P mP="(sO">g7^</P> <P me="t">f</P> </Block>
+<Block BlockType="o" Name="l" SID="4">
+<P Ne="s">1</P> <P Ne="P">0</P> <P ae="O">4</P> <P ae="e">u</P>'<P	irzk="">++Z</P>G<PXOR="fG">=%</P>	hi<P	qYgK="">T9l</P> <P me="a">o</P>
+</Block>
+<Block BlockType="R" Name="b" SID="5"> <P ae="P">3</P> <P Ne="e">5</P> <P me="M">[</P> <P me="e">9</P> <P ae="e">9</P>
+<P Ne="a">0</P>
+</Block>
+<Line> <P me="Z">5</P> <P Ne="S">#</P> <P me="n">[</P> <Branch> <P me="r">1</P>
+<P me="i">0</P>ys1<P	kW_D=""></P>ujh<PFwAH="Sg">Om7</P> </Branch> <Branch>
+<P ae="r">6</P> <P Ne="D">#</P> </Branch>|I9</Line> <Line> <P ae="O">6</P> <P ae="c">1</P> <P me="s"> </P> <Branch> <P Ne="Z">2</P> <P ae="i">;</P> <P Ne="D">i</P> </Branch> <Branch> <P ae="d">4</P> <P Ne="D">#</P> </Branch> </Line>
+</System>
+
+pass
+
+Input: <?ml version="1.0" encoding="t"?>
+<System> <P Ne="o">1</P> <P ae="R">0</P>
+<P ae="O">n</P> <P Ne="o">f</P> <P Ne="m">c</P> <P Ne="R">e</P>
+<P Ne="I">6</P>
+<P me="S">l</P>
+<Block BWockType="i" Name="1" SID="1">
+<P ae="o"> </P> <P ae="o">0</P> <P me="r">1</P> <P ae="P">u</P> <P me="m">1</P> </Block>
+<Block BlockEype="u" Name="k" SID="2"> <P ae="i">5</P> <P ae="e">2</P> </Block>
+<Block BlockType="y" Name="f" SID="3"> <P ae="t">1</P> <P me="o">,</P>
+<P me="r">3</P> <P ae="n">1</P> </Block>
+<Block BlockType="S" Name="b" SID="5"> <P me="i">6</P> <P ae="O">5</P> <P ae="m">.</P> <P Ne="B">7</P> <P me="r">2</P>
+<P Ne="S">0</P> </Block> <Block BlockType="r" Name="4" SID="4">
+<P Ne="n">7</P> <P me="e">4</P> </Block>
+<Line> <P Ne="e">1</P> <P Ne="S">u</P> <P Ne="i">5</P> <P me="s">n</P> </Line> <Line> <P ae="d">4</P>
+<P me="r">u</P>
+<P ae="t"> </P> <Branch> <P ae="e">2</P> <P Ne="D">4</P> </Branch> <Branch> <P me="Z">5</P> <P me="P">]</P> <P Ne="s">#</P>
+</Branch> </Line> <Line> <P ae="r">3</P> <P Ne="c">1</P> <P ae="i">,</P> <P Ne="s">1</P> </Line>
+</System>
+
+pass
+
+Input: <?ml version="1.0" encoding="t"?>
+<System> <P ae="c">1</P>
+<P me="y">,</P> <P ae="e">o</P> <P me="c">o</P>
+<P ae="x">e</P>
+<P aI="e">p</P>O<P ae="t">5</P> <P Ne="S">n</P> <Block BlockType="c" Name="1" SID="1"> <P me="s">1</P> <P Ne="i">9</P> <P Ne="d">1</P> <P me="t">u</P>
+<P Ne="p">1</P> </Block> <Block BlmckType="t" Name="k" SID="2"> <P Ne="r">2</P>
+<P Ne="P">3</P> <P Ne="Z">2</P>
+<P ae="t">*</P>
+</Block> <Block Bl_gkckType="T" Name="f" SID="3"> <P me="t">1</P> <P ae="d">3</P>
+</Block> <Block BlockType="a" NEj="u\%" A="a::" P="bJW"	Rme="f" SID="4"> <P ae="i">,</P> <P Ne="r">4</P> <P me="V">1</P>
+<P me="S">1</P> </Block>Y#<P	BKGh="_=?">%o</P>
+<Line> <P Ne="Z">1</P> <P Ne="c">t</P> <P me="n">?`</P>
+<P ae="t">i</P> </Line>
+<Line> <P me="e">2</P> <P me="S">4</P>
+<P ae="t">6</P> <P ae="D">i</P> </Line>
+<Line> <P Ne="d">4</P> <P ae="r">u</P> <P Ne="n">0</P>Y<Branch> <P Ne="d">3</P> <P ae="i">-</P> <P Ne="D">n</P> </Branch>
+<Branch>
+<P Ne="r">5</P> <P me="s">0</P> <P ae="t">#</P> </Branch> </Line>
+</System>
+
+pass
+
+Input: <?ml version="1.0" encoding="t"?>
+<System> <P Ne="o">Q</P> <P a:="H\9">*8</P>
+<P ae="O">n</P> <P Ne="o">f</P> <P Ne="m">c</P> <P Ne="R">e</P>Chc<PH:="/@;">cYt</P>
+<P me="S">l</P>
+<Block BlockTypo="i" Name="1" SID="1">
+<P>S="$ph">QKa</P> <P ae="o">0</P> <P me="r">1</P> <P ae="%">u</P> <P me="m">1</P> </Block>
+<Block BlockType="u" Name="k" SID="2"> <P ae="i">5</P> <P ae="e">2</P> </Block>
+<Block Blou="m:"NBl="Sw"	_kType="y" Name="f" SID="3"> <P ae="t">1</P> <P me="o">,</P>
+<P me="r">3</P>p
+a<PctA="`"></P> </Block>
+<Block BlockTyqm="3_"w=">" j=".3|" Hme="b" SID="5"> <P me="i">6</P>(<PskcO="=y}">,</P> <P ae="m">.</P> <P Ne="B">7</P> <P me="r">2</P>
+<P Ne="S">0</P>-</Block> <Block BlockType="r" NamE="4" SID="4">
+<P Ne="n">7</P> <P me="e">4</P> </Block>
+<Line> <P ce="e">1</P> <P NH="C"></P> <P Ne="'">5</P>|IZ<P>aU="+">{</P> </Line> <Line> <P ae="d">4</P>
+<P me="r">u</P>
+<P ae="t"> </P> <Branch> <P ae="e">2</P>Ddp<P vaqM="AI-">eu</P><PXu="\x7f">+'</P>Goi<P	dfxM="F\x7f=">
+</P> </Branch> <Branch> <P me="Z">5</P> <P me="P">]</P> <P Ne="s">#</P>
+</Branch> </Line> <Line> <P ae="r">3</P> <P Ne="c">1</P> <P ae="i">,</P> <P Ne="3">1</P> </Line>
+</System>
+
+pass
+
+Input: <?Il version="1.0" encoding="u"?>
+<System> <P Ne="o">5</P> <P Ne="t">0</P>
+<P aI="n">o</P> <P Ne="e">f</P> <P Ne="c">d</P>
+<P Ne="N">.</P> <P ae="k">6</P>
+<P Ne="o">S</P> <Block BlockTyFrwS="\"	Iame="f" SID="1"> <P Ne="o"> </P> <P me="d">1</P>ti<P
+RKZ="\x7f\d">q</P>b<P Ne="r">o</P> </Block>
+<Block BlockType="p" Name="?" SID="2"> <P Ne="o">]</P> <P ae="P"> </P> <P Ve="d">2</P> <P ae="c">m</P>
+<P me="t">1</P> <P Ne="i">o</P> </Block> <Block BlockType="p" Name="c" SID="4"> <P Ne=" ">[</P> <P me="o">0</P> <P	uI="UGU"></P> <P aI="*">E</P> <P Ne="u">1</P> <P Ne="F">o</P>
+</Block> <Block dJckTygamODLID="5"> <P Ne="o">*</P> <P ae="Z">5</P>
+<P Ne="a">6</P> <P Ne="S">1</P>
+</Block> <Block BlockType="r" Namz="b#S">l=""rV="{">a<PZEK="}c6">*cW</P><P>	:f="oH.">\</P>HH{</Block> <Line>
+<P Ne="O">1</P> <P ae="S">#</P> <P me="s">9</P> <P ae="s">3</P>
+</Line> <Line> <P Ne="Z">2</P> <P Ne="c">1</P> <P Ne="s">[</P>
+<P Ne="t">1</P> </Line>m</System>
+
+pass
+
+Pass rate: 0.8666667

@@ -28,6 +28,7 @@ import glade.util.Log;
 import glade.util.OracleUtils.DiscriminativeOracle;
 import glade.util.Utils.Maybe;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class GrammarSynthesis {
 		return GrammarTransformer.getTransform(RegexSynthesis.getNode(example, oracle), oracle);
 	}
 
-	public static Grammar getGrammarSingle(String example, DiscriminativeOracle oracle) {
+	public static Grammar getGrammarSingle(String example, DiscriminativeOracle oracle) throws IOException {
 		long time = System.currentTimeMillis();
 		if(!oracle.query(example)) {
 			throw new RuntimeException("Invalid example: " + example);
@@ -82,8 +83,13 @@ public class GrammarSynthesis {
 
 	public static boolean getCheck(DiscriminativeOracle oracle, Context context, Iterable<String> examples) {
 		for(String example : examples) {
-			if(!oracle.query(context.pre + example + context.post) || (context.useExtra() && !oracle.query(context.extraPre + example + context.extraPost))) {
-				return false;
+			try {
+				if(!oracle.query(context.pre + example + context.post) || (context.useExtra() && !oracle.query(context.extraPre + example + context.extraPost))) {
+					return false;
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		return true;

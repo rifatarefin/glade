@@ -27,6 +27,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -37,8 +38,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.InputSource;
+import com.mathworks.engine.*;
 
 import glade.util.Utils;
 import picocli.CommandLine;
@@ -145,7 +146,7 @@ class Learn implements Callable<Integer> {
     private CharacterUtils.InputAlphabet inputAlphabet;
 
     @Override
-    public Integer call() {
+    public Integer call() throws EngineException, IllegalArgumentException, IllegalStateException, InterruptedException {
         parent.initGlade();
         Log.debug("Starting subcommand learn");
         CharacterUtils.init(inputAlphabet);
@@ -180,6 +181,7 @@ class Learn implements Callable<Integer> {
         if(outputFile == null) {
             outputFile = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm").format(LocalDateTime.now()) + ".gram";
         }
+        
         Log.info("Saving grammar to " + outputFile);
         GrammarDataUtils.saveGrammar(outputFile, grammar);
         return 0;
@@ -218,7 +220,7 @@ class Fuzz implements Callable<Integer> {
     private double recursionProbability;
 
     @Override
-    public Integer call() { // TODO add support for combined fuzzer
+    public Integer call() throws Exception { // TODO add support for combined fuzzer
         parent.initGlade();
         Log.debug("Starting subcommand fuzz");
         int[] allowedLength = Main.parseAllowedLength(this.allowedLength);
@@ -285,8 +287,12 @@ class Oracle implements DiscriminativeOracle {
     private String command;
     private int[] allowedLength;
     private Path tempFile;
+    public Writer fileWriter;
+    MatlabEngine eng;
 
-    Oracle(String command, int[] allowedLength) {
+    Oracle(String command, int[] allowedLength) throws EngineException, IllegalArgumentException, IllegalStateException, InterruptedException {
+        
+        eng = MatlabEngine.startMatlab();
         this.command = command;
         this.allowedLength = allowedLength;
         if (command.contains("{/}")) {
@@ -299,7 +305,8 @@ class Oracle implements DiscriminativeOracle {
         }
     }
 
-    public boolean query(String query) { // TODO add timeout (use Future)
+    public boolean query(String query) throws IOException { // TODO add timeout (use Future)
+
         Log.debug("Oracle input: " + CharacterUtils.queryToAnsiString(query));
         if (allowedLength.length == 1 && query.length() != allowedLength[0]) {
             Log.debug("Oracle @|red failed|@ because the query length is not equal to " + allowedLength[0] + ".");
@@ -310,44 +317,54 @@ class Oracle implements DiscriminativeOracle {
                 + "-" + allowedLength[1] + ".");
             return false;
         }
+        try(FileWriter fw = new FileWriter("current_input.mdl", false)){
+            
+            fw.write(query);
+            
+        }
         try {
-
-            SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(query)));
+            
+            // SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(query)));
+            this.eng.eval("load_system('current_input.mdl')");
             return true;
             // Process p;
             // if (command.contains("{}")) {
-            //     if (query.contains("\0")) { // Command arguments can't contain null bytes.
-            //         Log.debug("Oracle @|red failed|@ because the query contains a null byte.");
+                //     if (query.contains("\0")) { // Command arguments can't contain null bytes.
+                //         Log.debug("Oracle @|red failed|@ because the query contains a null byte.");
             //         return false;
             //     }
             //     p = Runtime.getRuntime().exec(command.replace("{}", query));
             // } else if (command.contains("{/}")) {
-            //     FileOutputStream out = new FileOutputStream(tempFile.toFile(), false);
-            //     for (char c : query.toCharArray()) {
+                //     FileOutputStream out = new FileOutputStream(tempFile.toFile(), false);
+                //     for (char c : query.toCharArray()) {
             //         out.write(c);
             //     }
             //     out.close();
             //     p = Runtime.getRuntime().exec(command.replace("{/}", tempFile.toString()));
             // } else {
-            //     p = Runtime.getRuntime().exec(command);
+                //     p = Runtime.getRuntime().exec(command);
             //     for (char c : query.toCharArray()) {
-            //         p.getOutputStream().write(c);
-            //     }
-            //     p.getOutputStream().close();
+                //         p.getOutputStream().write(c);
+                //     }
+                //     p.getOutputStream().close();
+                // }
+                
+                // Log.debug("Oracle STDOUT: " + new BufferedReader(new InputStreamReader(p.getInputStream()))
+                //     .lines().collect(Collectors.joining("\n")));
+                // Log.debug("Oracle STDERR: " + new BufferedReader(new InputStreamReader(p.getErrorStream()))
+                //     .lines().collect(Collectors.joining("\n")));
+                
+                // p.waitFor();
+                
+                // Log.debug("Oracle exit value: " + (p.exitValue() == 0 ? "@|green " : "@|red ") + p.exitValue() + "|@");
+                // return p.exitValue() == 0;
+            } catch (Exception e) {
+                // throw new IllegalStateException(e);
+                return false;
+            }
+            // finally {
+                
+            //     System.exit(0);
             // }
-
-            // Log.debug("Oracle STDOUT: " + new BufferedReader(new InputStreamReader(p.getInputStream()))
-            //     .lines().collect(Collectors.joining("\n")));
-            // Log.debug("Oracle STDERR: " + new BufferedReader(new InputStreamReader(p.getErrorStream()))
-            //     .lines().collect(Collectors.joining("\n")));
-
-            // p.waitFor();
-
-            // Log.debug("Oracle exit value: " + (p.exitValue() == 0 ? "@|green " : "@|red ") + p.exitValue() + "|@");
-            // return p.exitValue() == 0;
-        } catch (Exception e) {
-            // throw new IllegalStateException(e);
-            return false;
         }
-    }
 }

@@ -93,7 +93,13 @@ public class GrammarDataUtils {
 
 	public static void learnGrammar(String grammarPath, String name, ProgramData data, ProgramExamples examples, int index) {
 		String example = examples.getTrainExamples().get(index);
-		Grammar grammar = GrammarSynthesis.getGrammarSingle(example, ProgramDataUtils.getQueryOracle(data));
+		Grammar grammar=null;
+		try {
+			grammar = GrammarSynthesis.getGrammarSingle(example, ProgramDataUtils.getQueryOracle(data));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		saveGrammar(grammarPath, name, index, grammar);
 	}
 	

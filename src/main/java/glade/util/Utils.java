@@ -86,6 +86,10 @@ public class Utils {
 	}
 
     public static void printlnAnsi(String ansiString) {
+		ansiString = ansiString.replace("\\x0a", "\n");
+		ansiString = ansiString.replace("\\x0d", "\r");
+		ansiString = ansiString.replace("\\x09", "\t");
         System.out.println(CommandLine.Help.Ansi.AUTO.string(ansiString));
+		// System.out.println(ansiString);
     }
 }
