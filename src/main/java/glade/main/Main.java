@@ -245,7 +245,8 @@ class Fuzz implements Callable<Integer> {
         int pass = 0;
         int processed = 0;
         for(String sample : samples) {
-            Utils.printlnAnsi("Input: " + CharacterUtils.queryToAnsiString(sample));
+            String input = CharacterUtils.queryToAnsiString(sample);
+            Utils.printlnAnsi("Input: " + input);
             if(oracle.query(sample)) {
                 Utils.printlnAnsi("@|green pass|@");
                 pass++;
@@ -254,6 +255,13 @@ class Fuzz implements Callable<Integer> {
             }
             System.out.println();
 
+            // write mdl files
+            PrintWriter mdl = new PrintWriter("fuzz/"+String.valueOf(processed)+".mdl");
+            String fuzz = input.replace("\\x0a", "\n");
+            fuzz = fuzz.replace("\\x0d", "\r");
+            fuzz = fuzz.replace("\\x09", "\t");
+            mdl.write(CommandLine.Help.Ansi.AUTO.string(fuzz));
+            mdl.close();
             processed++;
             if(processed >= count) {
                 break;
@@ -289,8 +297,9 @@ class Oracle implements DiscriminativeOracle {
     private Path tempFile;
     public Writer fileWriter;
     MatlabEngine eng;
-
+    
     Oracle(String command, int[] allowedLength) throws EngineException, IllegalArgumentException, IllegalStateException, InterruptedException {
+        
         
         eng = MatlabEngine.startMatlab();
         this.command = command;
@@ -326,6 +335,12 @@ class Oracle implements DiscriminativeOracle {
             
             // SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(query)));
             this.eng.eval("load_system('current_input.mdl')");
+            // Log.info("Successfully Loaded");
+            // this.eng.eval("current_input([], [], [], 'compile')");
+            // this.eng.eval("current_input([], [], [], 'term')");
+            // Log.info("Successfully compiled");
+            this.eng.eval("close_system('current_input.mdl')");
+            // Log.info("Successfully closed");
             return true;
             // Process p;
             // if (command.contains("{}")) {
@@ -360,11 +375,9 @@ class Oracle implements DiscriminativeOracle {
                 // return p.exitValue() == 0;
             } catch (Exception e) {
                 // throw new IllegalStateException(e);
+                // Log.info("Error in parsing");
                 return false;
             }
-            // finally {
-                
-            //     System.exit(0);
-            // }
+            
         }
 }

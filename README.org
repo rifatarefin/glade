@@ -56,12 +56,17 @@
     #+END_SRC
     Grammar will be saved in the current /working directory/.
 
-**** Edit
+**** Edit 1
     Learning grammar from XMLs supported only. The =command= field should be empty.
     #+BEGIN_SRC sh
     glade learn ''
     #+END_SRC
 
+**** Edit 2
+    Simulink =mdl= files supported only. Need to use gradle wrapper instead of nativeImage. The following command learns grammar and save log to sim.txt file
+    #+BEGIN_SRC sh
+    ./gradlew run --args="-f sim.txt learn ''"
+    #+END_SRC
     GLADE can also use bytes as an input alphabet. You will need to pass
     =--alphabet=BYTE= as a GLADE's argument.
 *** Fuzz
