@@ -256,7 +256,7 @@ class Fuzz implements Callable<Integer> {
             System.out.println();
 
             // write mdl files
-            PrintWriter mdl = new PrintWriter("fuzz/"+String.valueOf(processed)+".mdl");
+            PrintWriter mdl = new PrintWriter("fuzz/model"+String.valueOf(processed)+".mdl");
             String fuzz = input.replace("\\x0a", "\n");
             fuzz = fuzz.replace("\\x0d", "\r");
             fuzz = fuzz.replace("\\x09", "\t");
@@ -334,13 +334,18 @@ class Oracle implements DiscriminativeOracle {
         try {
             
             // SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(query)));
-            this.eng.eval("load_system('current_input.mdl')");
+            this.eng.eval("load_system('current_input')");
             // Log.info("Successfully Loaded");
             // this.eng.eval("current_input([], [], [], 'compile')");
             // this.eng.eval("current_input([], [], [], 'term')");
             // Log.info("Successfully compiled");
-            this.eng.eval("close_system('current_input.mdl')");
             // Log.info("Successfully closed");
+            String md = eng.feval("bdroot");
+            
+            eng.feval(0,"slreportgen.utils.compileModel", md);
+            eng.feval(0,"slreportgen.utils.uncompileModel", md);
+            this.eng.eval("close_system('current_input')");
+
             return true;
             // Process p;
             // if (command.contains("{}")) {

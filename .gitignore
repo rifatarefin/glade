@@ -1,6 +1,8 @@
 # -*- mode: gitignore; -*-
 #################### Glade
 /inputs/
+fuzz/
+fuzz.txt
 *.gram
 
 #################### Gradle
